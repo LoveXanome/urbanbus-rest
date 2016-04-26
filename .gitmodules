@@ -1,0 +1,3 @@
+[submodule "gtfslib-python"]
+	path = gtfslib-python
+	url = https://github.com/LoveXanome/gtfslib-python.git
