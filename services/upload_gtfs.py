@@ -16,3 +16,7 @@ def savefile(filedata):
 	with open(zip_path, 'wb') as f:
 		f.write(filedata)
 	return zip_path
+
+def add_gtfs_to_db(file):
+	#dao.Dao()
+	pass
