@@ -13,18 +13,17 @@ def upload_gtfszip():
         abort(400)
     file=request.json['file']
     return file
-    
+
+
+# curl -i -H "Content-Type: application/octet-stream" -X POST --data-binary @C:\\Users\\David\\Documents\\PLD-SmartCity\\urbanbus-rest\\requirements.txt http://localhost:5000/upload/gtfs    
 @app.route("/upload/gtfs", methods=['PUT', 'POST'])
 def upload_file():
     if request.headers['Content-Type'] != 'application/octet-stream':
         abort(400)
     filename = upload_gtfs.savefile(request.data)
-    could_add_to_db = upload_gtfs.add_gtfs_to_db(filename)
+    #could_add_to_db = upload_gtfs.add_gtfs_to_db(filename)
     
-    '''zip_name = "./tmp/gtfs_{0}.zip".format()
-    with open('./tmp/gtfs.zip', 'wb') as f:
-        f.write(request.data)'''
-    return "Binary message written!" # TODO return json saying OK + return code 
+    return filename # TODO return json saying OK + return code 
 
 
 @app.route("/routes", methods=['GET'])
