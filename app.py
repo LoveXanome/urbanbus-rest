@@ -15,9 +15,5 @@ def display():
     return get_routes()
 
 
-@app.route("/urban")
-def get_urban():
-    return "Hello World!"
-
 if __name__ == "__main__":
     app.run(debug=True)
