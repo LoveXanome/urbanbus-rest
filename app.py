@@ -7,6 +7,7 @@ sys.path.append(gtfslibpath)
 from flask import Flask, request, abort
 from services import upload_gtfs
 from services.display_routes import get_routes
+from services.display_agencies import get_agencies
 
 app = Flask(__name__)
 
@@ -29,6 +30,9 @@ def upload_file():
     
     return filename # TODO return json saying OK + return code 
 
+@app.route("/agencies", methods=['GET'])
+def display_agencies():
+	return get_agencies()
 
 @app.route("/routes", methods=['GET'])
 def display():
