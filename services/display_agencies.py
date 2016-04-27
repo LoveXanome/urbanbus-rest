@@ -5,7 +5,7 @@ from gtfslib.dao import Dao
 from gtfslib.model import Agency
 
 def get_agencies():
-	dao = Dao("services/db.sqlite")
+	dao = get_dao()
 	lines = []
 
 	for agency in dao.agencies():

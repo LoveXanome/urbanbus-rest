@@ -44,7 +44,7 @@ def display_agencies():
 
 @app.route("/agencies/<int:agency_id>/lines", methods=['GET'])
 def display_lines(agency_id):
-    return get_routes()
+    return jsonify({ "routes": get_routes()})
 
 
 @app.route("/agencies/<int:agency_id>/lines/urban", methods=['GET'])
