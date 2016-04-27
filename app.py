@@ -4,11 +4,12 @@ import sys, os
 gtfslibpath = os.path.join(os.getcwd(), 'gtfslib-python')
 sys.path.append(gtfslibpath)
 
-from flask import Flask, request, abort
+from flask import Flask, request, abort, jsonify
 from services import upload_gtfs
 from services.display_routes import get_routes
 from services.display_agencies import get_agencies
 import json
+from services.check_urban import get_urban_status
 
 app = Flask(__name__)
 
@@ -41,9 +42,14 @@ def upload_file():
 def display_agencies():
 	return get_agencies()
 
-@app.route("/routes", methods=['GET'])
-def display():
-    return get_routes()
+@app.route("/agencies/<int:agency_id>/lines", methods=['GET'])
+def display_lines():
+    return get_lines()
+
+
+@app.route("/agencies/<int:agency_id>/lines/urban", methods=['GET'])
+def display_urban(agency_id):
+    return jsonify(get_urban_status())
 
 
 if __name__ == "__main__":
