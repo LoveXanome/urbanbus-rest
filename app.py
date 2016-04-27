@@ -17,7 +17,7 @@ def error(message):
 
 @app.route("/", methods=['POST'])
 def upload_gtfszip():
-    print(request, flush=True)
+    #print(request, flush=True)
     if not request.json and not 'file' in request.json:
         abort(400)
     file=request.json['file']
