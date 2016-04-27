@@ -20,4 +20,5 @@ def get_urban_status():
 		line["urban"] = str(urbain)
 
 		lines.append(line)
-	return json.dumps(lines, sort_keys=True, indent=4, separators=(',', ': '))
+		print line
+	return lines

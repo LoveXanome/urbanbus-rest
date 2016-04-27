@@ -43,13 +43,13 @@ def display_agencies():
 	return get_agencies()
 
 @app.route("/agencies/<int:agency_id>/lines", methods=['GET'])
-def display_lines():
-    return get_lines()
+def display_lines(agency_id):
+    return get_routes()
 
 
 @app.route("/agencies/<int:agency_id>/lines/urban", methods=['GET'])
 def display_urban(agency_id):
-    return jsonify(get_urban_status())
+    return jsonify({ "routes": get_urban_status()})
 
 
 if __name__ == "__main__":
