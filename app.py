@@ -26,7 +26,7 @@ def upload_file():
     if request.headers['Content-Type'] != 'application/octet-stream':
         abort(400)
     filename = upload_gtfs.savefile(request.data)
-    #could_add_to_db = upload_gtfs.add_gtfs_to_db(filename)
+    could_add_to_db = upload_gtfs.add_gtfs_to_db(filename)
     
     return filename # TODO return json saying OK + return code 
 

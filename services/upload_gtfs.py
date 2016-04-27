@@ -2,6 +2,7 @@
 
 from datetime import datetime
 import os
+from database.database_access import get_dao 
 
 TMPDIR = 'tmp/'
 
@@ -18,5 +19,5 @@ def savefile(filedata):
 	return zip_path
 
 def add_gtfs_to_db(file):
-	#dao.Dao()
-	pass
+	dao = get_dao()
+	return False

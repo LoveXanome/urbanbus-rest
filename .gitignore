@@ -63,3 +63,6 @@ target/
 
 # Temporary gtfs zips
 tmp/
+
+# dbsqlite
+db.sqlite
