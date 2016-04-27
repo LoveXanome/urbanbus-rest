@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+import sys, os
+
+gtfslibpath = os.path.join(os.getcwd(), 'gtfslib-python')
+sys.path.append(gtfslibpath)
 
 from flask import Flask, request, abort
 from services import upload_gtfs
