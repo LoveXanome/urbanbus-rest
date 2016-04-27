@@ -1,4 +1,4 @@
-from gtfslib.dao import Dao
+from gtfslib import dao
 
 # TODO : adaptable configuration for database
 

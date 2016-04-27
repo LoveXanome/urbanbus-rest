@@ -8,8 +8,12 @@ from flask import Flask, request, abort
 from services import upload_gtfs
 from services.display_routes import get_routes
 from services.display_agencies import get_agencies
+import json
 
 app = Flask(__name__)
+
+def error(message):
+    return json.dumps({"error": message})
 
 @app.route("/", methods=['POST'])
 def upload_gtfszip():
@@ -20,15 +24,18 @@ def upload_gtfszip():
     return file
 
 
-# curl -i -H "Content-Type: application/octet-stream" -X POST --data-binary @C:\\Users\\David\\Documents\\PLD-SmartCity\\urbanbus-rest\\requirements.txt http://localhost:5000/upload/gtfs    
+# Example curl -i -H "Content-Type: application/octet-stream" -X POST --data-binary @nantes.zip http://localhost:5000/upload/gtfs
 @app.route("/upload/gtfs", methods=['PUT', 'POST'])
 def upload_file():
     if request.headers['Content-Type'] != 'application/octet-stream':
         abort(400)
     filename = upload_gtfs.savefile(request.data)
-    could_add_to_db = upload_gtfs.add_gtfs_to_db(filename)
+    errormsg = upload_gtfs.add_gtfs_to_db(filename)
     
-    return filename # TODO return json saying OK + return code 
+    if errormsg:
+        return error(errormsg), 400
+    
+    return json.dumps({"status": 201}), 201 
 
 @app.route("/agencies", methods=['GET'])
 def display_agencies():

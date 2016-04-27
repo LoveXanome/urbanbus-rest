@@ -2,7 +2,7 @@
 
 from datetime import datetime
 import os
-from database.database_access import get_dao 
+from database import database_access 
 
 TMPDIR = 'tmp/'
 
@@ -19,5 +19,11 @@ def savefile(filedata):
 	return zip_path
 
 def add_gtfs_to_db(file):
-	dao = get_dao()
-	return False
+	dao = database_access.get_dao()
+	errormsg = None
+	try:
+		dao.load_gtfs(file)
+		# TODO add to our table when the file was added
+	except Exception as e:
+		errormsg = "Error loading gtfs zip file: {0}".format(str(e))
+	return errormsg
