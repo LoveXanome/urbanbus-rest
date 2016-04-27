@@ -16,8 +16,8 @@ def get_urban_status():
 		line["name"] = route.route_long_name
 
 		trips = list(route.trips)
-		urbain = decret_2015_1610.decret_2015_1610(trips)
-		line["urban"] = str(urbain)
+		category = decret_2015_1610.decret_2015_1610(trips)
+		line["category"] = str(category)
 
 		lines.append(line)
 		print line

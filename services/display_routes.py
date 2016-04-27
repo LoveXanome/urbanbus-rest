@@ -10,8 +10,12 @@ def get_routes():
 	parsedRoutes = []
 
 	for route in dao.routes(fltr=Route.route_type == Route.TYPE_BUS):
+		print route
 		parsedRoute = dict()
 		parsedRoute["name"] = route.route_long_name
 
 		parsedRoutes.append(parsedRoute)
 	return parsedRoutes
+
+def get_stoptime():
+	pass
