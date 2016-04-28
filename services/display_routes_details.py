@@ -12,7 +12,7 @@ def get_routes_details(limit):
 	for route in dao.routes(fltr=Route.route_type == Route.TYPE_BUS):
 		if count < limit:
 			parsedRoute = dict()
-			parsedStops = list()
+			
 			parsedPoints = list()
 			parsedRoute["name"] = route.route_long_name
 			count+=1
@@ -30,29 +30,12 @@ def get_routes_details(limit):
 					parsedPoints.append(parsedPoint)
 				parsedRoute['points'] = parsedPoints
 
-			# All trips have same trip_id so we may use only the first
-			stoptimes = dao.stoptimes(fltr=StopTime.trip_id == route.trips[0].trip_id)
-			print "nb of trips: "+str(len(route.trips))
-			print "ID trip used: "+str(route.trips[0].trip_id)
-			print "trip headsign used: "+route.trips[0].trip_headsign.encode('ASCII', 'ignore')
-			#print stoptimes
+			parsedRoute['stops'] = get_route_stops(dao, route.trips[0].trip_id)
 
-			countStops = 0
-			for stoptime in stoptimes:
-				stop = dao.stop(stoptime.stop_id)
-				parsedStop = dict()
-				if stop is not None:
-					countStops += 1
-					parsedStop['name'] = stop.stop_name
-					parsedStop['lat'] = stop.stop_lat
-					parsedStop['lng'] = stop.stop_lon
-				parsedStops.append(parsedStop)
-
-			parsedRoute['stops'] = parsedStops
 			parsedRoutes.append(parsedRoute)
 			print('Nb shapepoints = ', countPoints)
-			print('Nb stoppoints = ', countStops)
-			print('Nb of equal points = ', count_equal_points(parsedPoints, parsedStops))
+			
+			print('Nb of equal points = ', count_equal_points(parsedPoints, parsedRoute['stops']))
 	return parsedRoutes
 
 def get_stoptime():
@@ -69,3 +52,23 @@ def count_equal_points(points, stops):
 				countEqual += 1
 				break
 	return countEqual
+
+def get_route_stops(dao, tripId):
+	parsedStops = list()
+	countStops = 0
+
+	stoptimes = dao.stoptimes(fltr=StopTime.trip_id == tripId)
+
+	for stoptime in stoptimes:
+		stop = dao.stop(stoptime.stop_id)
+		parsedStop = dict()
+
+		if stop is not None:
+			countStops += 1
+			parsedStop['name'] = stop.stop_name
+			parsedStop['lat'] = stop.stop_lat
+			parsedStop['lng'] = stop.stop_lon
+
+		parsedStops.append(parsedStop)
+	print('Nb stop points = ', countStops)
+	return parsedStops
