@@ -11,31 +11,17 @@ def get_routes_details(limit):
 	count = 0
 	for route in dao.routes(fltr=Route.route_type == Route.TYPE_BUS):
 		if count < limit:
+			count+=1
 			parsedRoute = dict()
 			
-			parsedPoints = list()
 			parsedRoute["name"] = route.route_long_name
-			count+=1
-			
-			# All trips have same trip_id so we may use only the first
-			shape = dao.shape(route.trips[0].shape_id)
-			
-			countPoints = 0
-			if shape is not None:
-				for point in shape.points:
-					countPoints += 1
-					parsedPoint = dict()
-					parsedPoint['lat'] = point.shape_pt_lat
-					parsedPoint['lng'] = point.shape_pt_lon
-					parsedPoints.append(parsedPoint)
-				parsedRoute['points'] = parsedPoints
-
+			# All trips have same trip_id so we may use only the first : route.trips[0]
+			parsedRoute['points'] = get_route_shapepoints(dao, route.trips[0].shape_id)
 			parsedRoute['stops'] = get_route_stops(dao, route.trips[0].trip_id)
 
 			parsedRoutes.append(parsedRoute)
-			print('Nb shapepoints = ', countPoints)
 			
-			print('Nb of equal points = ', count_equal_points(parsedPoints, parsedRoute['stops']))
+			print('Nb of equal points = ', count_equal_points(parsedRoute))
 	return parsedRoutes
 
 def get_stoptime():
@@ -44,10 +30,10 @@ def get_stoptime():
 def equal_point(pointA, pointB):
 	return pointA.get('lat') == pointB.get('lat') and pointA.get('lng') == pointB.get('lng')
 
-def count_equal_points(points, stops):
+def count_equal_points(route):
 	countEqual = 0
-	for point in points:
-		for stop in stops:
+	for point in route.get('points'):
+		for stop in route.get('stops'):
 			if equal_point(point, stop):
 				countEqual += 1
 				break
@@ -61,14 +47,31 @@ def get_route_stops(dao, tripId):
 
 	for stoptime in stoptimes:
 		stop = dao.stop(stoptime.stop_id)
-		parsedStop = dict()
 
 		if stop is not None:
 			countStops += 1
+			parsedStop = dict()
 			parsedStop['name'] = stop.stop_name
 			parsedStop['lat'] = stop.stop_lat
 			parsedStop['lng'] = stop.stop_lon
+			parsedStops.append(parsedStop)
 
-		parsedStops.append(parsedStop)
 	print('Nb stop points = ', countStops)
 	return parsedStops
+
+def get_route_shapepoints(dao, shapeId):
+	parsedPoints = list()
+	countPoints = 0
+
+	shape = dao.shape(shapeId)
+	
+	if shape is not None:
+		for point in shape.points:
+			countPoints += 1
+			parsedPoint = dict()
+			parsedPoint['lat'] = point.shape_pt_lat
+			parsedPoint['lng'] = point.shape_pt_lon
+			parsedPoints.append(parsedPoint)
+
+	print('Nb shape points = ', countPoints)
+	return parsedPoints
