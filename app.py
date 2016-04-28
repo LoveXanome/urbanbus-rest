@@ -8,21 +8,13 @@ from flask import Flask, request, abort
 from services import upload_gtfs
 from services.display_routes import get_routes
 from services.display_agencies import get_agencies
+from database.database_access import init_db
 import json
 
 app = Flask(__name__)
 
 def error(message):
     return json.dumps({"error": message})
-
-@app.route("/", methods=['POST'])
-def upload_gtfszip():
-    print(request, flush=True)
-    if not request.json and not 'file' in request.json:
-        abort(400)
-    file=request.json['file']
-    return file
-
 
 # Example curl -i -H "Content-Type: application/octet-stream" -X POST --data-binary @nantes.zip http://localhost:5000/upload/gtfs
 @app.route("/upload/gtfs", methods=['PUT', 'POST'])
@@ -47,4 +39,5 @@ def display():
 
 
 if __name__ == "__main__":
+    init_db()
     app.run(debug=True)
