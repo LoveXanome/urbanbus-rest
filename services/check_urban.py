@@ -13,10 +13,9 @@ def get_urban_status():
 	for route in dao.routes(fltr=Route.route_type == Route.TYPE_BUS):
 		line = dict()
 		line["name"] = route.route_long_name
-
-		trips = list(route.trips)
-		category = decret_2015_1610.decret_2015_1610(trips)
-		line["category"] = str(category)
-
+		line["category"] = check_urban_category(route.trips)
 		lines.append(line)
 	return lines
+
+def check_urban_category(trips):
+	return decret_2015_1610.decret_2015_1610(trips)

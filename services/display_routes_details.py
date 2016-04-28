@@ -4,6 +4,7 @@ from database.database_access import get_dao
 from gtfslib.model import Route, StopTime, Shape
 from gtfsplugins import decret_2015_1610
 from database.database_access import get_dao
+from services.check_urban import check_urban_category
 
 def get_routes_details(limit):
 	dao = get_dao()
@@ -15,6 +16,7 @@ def get_routes_details(limit):
 			parsedRoute = dict()
 			
 			parsedRoute["name"] = route.route_long_name
+			parsedRoute["category"] = check_urban_category(route.trips)
 			# All trips have same trip_id so we may use only the first : route.trips[0]
 			parsedRoute['points'] = get_route_shapepoints(dao, route.trips[0].shape_id)
 			parsedRoute['stops'] = get_route_stops(dao, route.trips[0].trip_id)
@@ -51,6 +53,7 @@ def get_route_stops(dao, tripId):
 		if stop is not None:
 			countStops += 1
 			parsedStop = dict()
+			parsedStop['id'] = stop.stop_id
 			parsedStop['name'] = stop.stop_name
 			parsedStop['lat'] = stop.stop_lat
 			parsedStop['lng'] = stop.stop_lon
@@ -67,8 +70,10 @@ def get_route_shapepoints(dao, shapeId):
 	
 	if shape is not None:
 		for point in shape.points:
+			print(point)
 			countPoints += 1
 			parsedPoint = dict()
+			parsedPoint['id'] = str(point.feed_id)+str(point.shape_id)+str(point.shape_pt_sequence)
 			parsedPoint['lat'] = point.shape_pt_lat
 			parsedPoint['lng'] = point.shape_pt_lon
 			parsedPoints.append(parsedPoint)
