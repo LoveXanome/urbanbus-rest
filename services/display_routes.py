@@ -1,23 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import json
 from database.database_access import get_dao
 from gtfslib.model import Route
 from gtfsplugins import decret_2015_1610
+from database.database_access import get_dao
 
 def get_routes():
 	dao = get_dao()
-	lines = []
+	parsedRoutes = []
 
 	for route in dao.routes(fltr=Route.route_type == Route.TYPE_BUS):
-		# routes = dao.routes(fltr=Route.route_type == Route.TYPE_BUS)
-		# route = routes[0]
-		line = dict()
-		line["name"] = route.route_long_name
+		parsedRoute = dict()
+		parsedRoute["name"] = route.route_long_name
 
-		trips = list(route.trips)
-		urbain = decret_2015_1610.decret_2015_1610(trips)
-		line["urban"] = str(urbain)
+		parsedRoutes.append(parsedRoute)
+	return parsedRoutes
 
-		lines.append(line)
-	return json.dumps(lines, sort_keys=True, indent=4, separators=(',', ': '))
+def get_stoptime():
+	pass

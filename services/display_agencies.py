@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import json
 from gtfslib.dao import Dao
 from gtfslib.model import Agency
+from database.database_access import get_dao
 
 def get_agencies():
-	dao = Dao("services/db.sqlite")
+	dao = get_dao()
 	lines = []
 
 	for agency in dao.agencies():
@@ -15,4 +15,4 @@ def get_agencies():
 		line["id"] = agency.agency_id
 
 		lines.append(line)
-	return json.dumps(lines, sort_keys=True, indent=4, separators=(',', ': '))
+	return lines

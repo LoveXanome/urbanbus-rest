@@ -24,5 +24,3 @@ def get_insee():
 			data.append(json.loads(line))
 	f.close()
 	return data
-		
-get_insee()
