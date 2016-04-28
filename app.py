@@ -16,6 +16,10 @@ app = Flask(__name__)
 def error(message):
     return json.dumps({"error": message})
 
+@app.route("/agencies", methods=['GET'])
+def display_agencies():
+	return get_agencies()
+
 # Example curl -i -H "Content-Type: application/octet-stream" -X POST --data-binary @nantes.zip http://localhost:5000/upload/gtfs
 @app.route("/upload/gtfs", methods=['PUT', 'POST'])
 def upload_file():
@@ -29,13 +33,12 @@ def upload_file():
     
     return json.dumps({"status": 201}), 201 
 
-@app.route("/agencies", methods=['GET'])
-def display_agencies():
-	return get_agencies()
-
-@app.route("/routes", methods=['GET'])
-def display():
-    return get_routes()
+@app.route("/agencies/<int:agency_id>/routes", methods=['GET'])
+def display_routes(agency_id):
+    try:
+        return get_routes(agency_id)
+    except Exception as e:
+        return error(str(e))
 
 
 if __name__ == "__main__":
