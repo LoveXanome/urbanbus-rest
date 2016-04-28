@@ -40,14 +40,14 @@ def upload_file():
 
 @app.route("/agencies", methods=['GET'])
 def display_agencies():
-	return get_agencies()
+	return jsonify({ "agencies": get_agencies()})
 
-@app.route("/agencies/<int:agency_id>/lines", methods=['GET'])
-def display_lines(agency_id):
+@app.route("/agencies/<int:agency_id>/routes", methods=['GET'])
+def display_routes(agency_id):
     return jsonify({ "routes": get_routes()})
 
 
-@app.route("/agencies/<int:agency_id>/lines/urban", methods=['GET'])
+@app.route("/agencies/<int:agency_id>/routes/urban", methods=['GET'])
 def display_urban(agency_id):
     return jsonify({ "routes": get_urban_status()})
 
