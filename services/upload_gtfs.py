@@ -2,7 +2,7 @@
 
 from datetime import datetime
 import os
-from database import database_access 
+from database import database_access as db
 
 TMPDIR = 'tmp/'
 
@@ -19,11 +19,29 @@ def savefile(filedata):
 	return zip_path
 
 def add_gtfs_to_db(file):
-	dao = database_access.get_dao()
+	dbname = _filename_to_dbname(file)
+	dao = db.access_direct_dao(dbname)
+	
 	errormsg = None
 	try:
 		dao.load_gtfs(file)
-		# TODO add to our table when the file was added
-	except Exception as e:
-		errormsg = "Error loading gtfs zip file: {0}".format(str(e))
+		dataset_id = db.create_dataset(dbname)
+		new_agencies = dao.agencies()
+		old_dataset_ids = db.update_agencies(new_agencies, dataset_id)
+		for old_id in old_dataset_ids:
+			db.delete_dataset(old_id)
+			
+			# Create URBAN table + calculate	
+		except Exception as e:
+			db.drop_database(dbname)
+			# TODO delete all created stuff and put db in old state
+			errormsg = "Error loading gtfs zip file: {0}".format(str(e))
 	return errormsg
+
+
+def _filename_to_dbname(filename):
+	filename = os.path.basename(filename)
+	if filename.endswith(".zip"):
+		filename = filename[:-4]
+	# Delete punctuation (of created file name)
+	return filename.replace('-', '').replace('_', '')

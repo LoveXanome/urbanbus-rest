@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, DateTime, func, ForeignKey, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import exists
+from sqlalchemy.schema import MetaData
 from gtfslib import dao
 
 Base = declarative_base()
@@ -51,6 +53,52 @@ def get_all_agencies():
 		agencies.append(row)
 	session.close()
 	return agencies
+	
+def access_direct_dao(dbname):
+	return dao.Dao(_get_complete_database_name(dbname))	
+
+def create_dataset(dbname):
+	session = _get_default_db_session()
+	
+	new_dataset = Dataset(database_name=dbname)
+	session.add(new_dataset)
+	session.commit()
+	
+	new_dataset_id = new_dataset.id
+	session.close()
+	return new_dataset_id
+	
+def update_agencies(new_agencies, new_dataset_id):
+	session = _get_default_db_session()
+	old_ids = []
+	for agency in new_agencies:
+		if _agency_exist(session, agency.agency_id, agency.agency_name):
+			ag = session.query(Agency).filter(Agency.agency_id == agency.agency_id, Agency.agency_name == agency.agency_name)[0]
+			old_ids.append(ag.dataset)
+			ag.dataset = new_dataset_id
+		else:
+			session.add(Agency(agency_id=agency.agency_id, agency_name=agency.agency_name, dataset=new_dataset_id))
+			
+	session.commit()
+	session.close()
+	return old_ids
+	
+def delete_dataset(id):
+	session = _get_default_db_session()
+	
+	dataset = session.query(Dataset).filter(Dataset.id == id)[0]
+	dbname = dataset.database_name
+	drop_database(dbname)
+	session.delete(dataset)
+	
+	session.commit()
+	session.close()
+	pass
+	
+def drop_database(dbname):
+	engine = create_engine(_get_complete_database_name(dbname))
+	meta = MetaData(bind=engine)
+	meta.drop_all(checkfirst=False)
 
 ''' "private" functions '''
 
@@ -61,7 +109,7 @@ def _get_default_db_session():
 def _retrieve_database(agency_id):
 	session = _get_default_db_session()
 	agencies = []
-	for agency in session.query(Agency).filter(Agency.id==agency_id):
+	for agency in session.query(Agency).filter(Agency.agency_id==agency_id):
 		agencies.append(agency)
 	if len(agencies) != 1:
 		session.close()
@@ -84,3 +132,9 @@ def _get_default_database_name():
 
 def _get_complete_database_name(database):
 	return "sqlite:///database/{0}.sqlite".format(database) # TODO conf file for database
+
+def _agency_exist(session, id, name):
+	result = []
+	for a in session.query(Agency).filter(Agency.agency_id == id, Agency.agency_name == name):
+		result.append(a)
+	return len(result) != 0
