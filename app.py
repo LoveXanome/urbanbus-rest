@@ -19,7 +19,7 @@ def error(message):
 
 @app.route("/agencies", methods=['GET'])
 def display_agencies():
-	return jsonify({ "agencies": get_agencies()})
+	return jsonify({"agencies": get_agencies()})
 
 
 # Example curl -i -H "Content-Type: application/octet-stream" -X POST --data-binary @nantes.zip http://localhost:5000/upload/gtfs

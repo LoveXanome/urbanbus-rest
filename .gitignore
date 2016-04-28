@@ -66,3 +66,9 @@ tmp/
 
 # SQLite databases
 *.sqlite
+
+# Visual Studio
+.vs/
+*.pyproj
+bin/
+obj/
