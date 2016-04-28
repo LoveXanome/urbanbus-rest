@@ -11,6 +11,7 @@ from services.display_agencies import get_agencies
 from database.database_access import init_db
 from services.display_insee import get_insee
 from services.check_urban import get_urban_status
+from services.display_routes_details import get_routes_details
 
 app = Flask(__name__)
 
@@ -46,6 +47,11 @@ def display_routes(agency_id):
 @app.route("/agencies/<int:agency_id>/routes/urban", methods=['GET'])
 def display_urban(agency_id):
     return jsonify({ "routes": get_urban_status()})
+
+@app.route("/agencies/<int:agency_id>/routes/details", methods=['GET'])
+def display_details(agency_id):
+    return jsonify({ "routes": get_routes_details(5)})
+
 
 
 @app.route("/insee", methods=['GET'])

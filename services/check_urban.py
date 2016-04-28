@@ -11,8 +11,6 @@ def get_urban_status():
 	lines = []
 
 	for route in dao.routes(fltr=Route.route_type == Route.TYPE_BUS):
-		# routes = dao.routes(fltr=Route.route_type == Route.TYPE_BUS)
-		# route = routes[0]
 		line = dict()
 		line["name"] = route.route_long_name
 

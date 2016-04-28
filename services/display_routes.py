@@ -7,12 +7,12 @@ from database.database_access import get_dao
 
 def get_routes(agency_id):
 	dao = get_dao(agency_id)
-	parsed_routes = []
+	parsedRoutes = list()
 
 	for route in dao.routes(fltr=Route.route_type == Route.TYPE_BUS):
-		parsed_routes.append({"name": route.route_long_name})
-		
-	return parsed_routes
+		parsedRoute = dict()
+		parsedRoute["name"] = route.route_long_name
+		parsedRoutes.append(parsedRoute)
 
-def get_stoptime():
-	pass
+	return parsedRoutes
+
