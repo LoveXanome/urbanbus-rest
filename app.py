@@ -8,6 +8,7 @@ from flask import Flask, request, abort
 from services import upload_gtfs
 from services.display_routes import get_routes
 from services.display_agencies import get_agencies
+from services.display_insee import get_insee
 import json
 
 app = Flask(__name__)
@@ -40,6 +41,10 @@ def upload_file():
 @app.route("/agencies", methods=['GET'])
 def display_agencies():
 	return get_agencies()
+	
+@app.route("/insee", methods=['GET'])
+def display_insee():
+	return get_insee()
 
 @app.route("/routes", methods=['GET'])
 def display():
