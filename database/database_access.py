@@ -98,7 +98,7 @@ def delete_dataset(id):
 def drop_database(dbname):
 	engine = create_engine(_get_complete_database_name(dbname))
 	meta = MetaData(bind=engine)
-	meta.drop_all(checkfirst=False)
+	meta.drop_all(checkfirst=False) # TODO doesn't really work. Database still full.
 
 ''' "private" functions '''
 
@@ -109,7 +109,7 @@ def _get_default_db_session():
 def _retrieve_database(agency_id):
 	session = _get_default_db_session()
 	agencies = []
-	for agency in session.query(Agency).filter(Agency.agency_id==agency_id):
+	for agency in session.query(Agency).filter(Agency.id==agency_id):
 		agencies.append(agency)
 	if len(agencies) != 1:
 		session.close()
