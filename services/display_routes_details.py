@@ -18,27 +18,16 @@ def get_routes_details(agency_id, limit):
 			parsedRoute["name"] = route.route_long_name
 			parsedRoute["category"] = check_urban_category(route.trips)
 			# All trips have same trip_id so we may use only the first : route.trips[0]
-			get_route_shapepoints(dao, route.trips[0].shape_id, listPoints)
-			get_route_stops(dao, route.trips[0].trip_id, listPoints)
+			_get_route_shapepoints(dao, route.trips[0].shape_id, listPoints)
+			_get_route_stops(dao, route.trips[0].trip_id, listPoints)
 			parsedRoute['points'] = listPoints
 			parsedRoutes.append(parsedRoute)
 			
 	return parsedRoutes
 
+'''	Private methods '''
 
-def equal_point(pointA, pointB):
-	return pointA.get('lat') == pointB.get('lat') and pointA.get('lng') == pointB.get('lng')
-
-def count_equal_points(route):
-	countEqual = 0
-	for point in route.get('points'):
-		for stop in route.get('stops'):
-			if equal_point(point, stop):
-				countEqual += 1
-				break
-	return countEqual
-
-def get_route_shapepoints(dao, shapeId, listPoints):
+def _get_route_shapepoints(dao, shapeId, listPoints):
 	countPoints = 0
 
 	shape = dao.shape(shapeId)
@@ -54,10 +43,10 @@ def get_route_shapepoints(dao, shapeId, listPoints):
 			parsedPoint['lng'] = point.shape_pt_lon
 			listPoints.append(parsedPoint)
 
-	print('Nb shape points = ', countPoints)
+	print('Nb shape points = '+str(countPoints))
 	return
 
-def get_route_stops(dao, tripId, listPoints):
+def _get_route_stops(dao, tripId, listPoints):
 	countStops = 0
 
 	stoptimes = dao.stoptimes(fltr=StopTime.trip_id == tripId)
@@ -73,8 +62,24 @@ def get_route_stops(dao, tripId, listPoints):
 			parsedStop['is_stop'] = True
 			parsedStop['lat'] = stop.stop_lat
 			parsedStop['lng'] = stop.stop_lon
-			listPoints.append(parsedStop)
+			if not _check_already_in(listPoints, parsedStop):
+				listPoints.append(parsedStop)
 
-	print('Nb stop points = ', countStops)
+	print('Nb stop points = '+str(countStops))
 	return 
 
+
+def _same_position(pointA, pointB):
+	return pointA.get('lat') == pointB.get('lat') and pointA.get('lng') == pointB.get('lng')
+
+def _set_is_stop(pointToModifiy, stop):
+	pointToModifiy['is_stop'] = True
+	pointToModifiy['name'] = "tralala"
+	pointToModifiy['id'] = stop['id']
+
+def _check_already_in(points, aPoint):
+	for point in points:
+		if _same_position(point, aPoint):
+			_set_is_stop(point, aPoint)
+			return True
+	return False
