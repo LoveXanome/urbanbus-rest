@@ -27,7 +27,8 @@ def add_gtfs_to_db(file):
 		dao.load_gtfs(file)
 		dataset_id = db.create_dataset(dbname)
 		new_agencies = dao.agencies()
-		old_dataset_ids = db.update_agencies(new_agencies, dataset_id)
+		lat, lng = db.get_random_mean_lat_lng(dbname)
+		old_dataset_ids = db.update_agencies(new_agencies, dataset_id, lat, lng)
 		for old_id in old_dataset_ids:
 			db.delete_dataset(old_id)
 			

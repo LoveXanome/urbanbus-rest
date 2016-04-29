@@ -24,7 +24,6 @@ def error(message):
 def display_agencies():
 	return jsonify({"agencies": get_agencies()})
 
-
 # Example curl -i -H "Content-Type: application/octet-stream" -X POST --data-binary @nantes.zip http://localhost:5000/upload/gtfs
 @app.route("/upload/gtfs", methods=['PUT', 'POST'])
 def upload_file():
@@ -72,5 +71,4 @@ def display_detailsRoute(agency_id,route_id):
 
 if __name__ == "__main__":
     init_db()
-    #app.run(host='0.0.0.0', debug=True)
     app.run(debug=True)

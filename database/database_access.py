@@ -5,6 +5,7 @@ from sqlalchemy.sql import exists
 from sqlalchemy.schema import MetaData
 from gtfslib import dao
 from gtfsplugins.decret_2015_1610 import decret_2015_1610
+from random import randint
 
 Base = declarative_base()
 GtfsBase = declarative_base()
@@ -84,20 +85,21 @@ def create_dataset(dbname):
 	session.close()
 	return new_dataset_id
 	
-def update_agencies(new_agencies, new_dataset_id):
+def update_agencies(new_agencies, new_dataset_id, lat, lng):
 	session = _get_default_db_session()
-    # TODO calculate long & lat
 	old_ids = []
 	for agency in new_agencies:
 		if _agency_exist(session, agency.agency_id, agency.agency_name):
 			ag = session.query(Agency).filter(Agency.agency_id == agency.agency_id, Agency.agency_name == agency.agency_name)[0]
 			old_ids.append(ag.dataset)
 			ag.dataset = new_dataset_id
+			ag.latitude = lat
+			ag.longitude = lng
 		else:
 			session.add(Agency( agency_id=agency.agency_id,
                                 agency_name=agency.agency_name,
-                                latitude=TODO,
-                                longitude=TODO,
+                                latitude=lat,
+                                longitude=lng,
                                 dataset=new_dataset_id))
 			
 	session.commit()
@@ -115,7 +117,48 @@ def delete_dataset(id):
 	session.commit()
 	session.close()
 	pass
-	
+
+def get_random_mean_lat_lng(dbname):
+    engine = create_engine(_get_complete_database_name(dbname))
+    selected = []
+    nb_points = 1
+    with engine.connect() as con:
+        sql_result = con.execute("SELECT * FROM shape_pts")
+        results = []
+
+        for r in sql_result:
+            results.append(r)
+  
+        nb_points = min(len(results), 50)
+        print(nb_points, flush=True)
+        for i in range(nb_points):
+            rand_i = randint(0, len(results)-1)
+            print(rand_i, flush=True)
+            selected.append(results[rand_i])
+
+    if nb_points == 0:
+        return 0, 0
+    lat = 0.
+    long = 0.
+    for r in selected:
+        lat += r[4]
+        long += r[5]
+    lat /= nb_points
+    long /= nb_points
+
+    return lat, long
+
+def get_lat_lng(agency_id):
+    session = _get_default_db_session()
+    lat = 0
+    lng = 0
+    for r in session.query(Agency).filter(Agency.id==agency_id):
+        lat = r.latitude
+        lng = r.longitude
+        break
+    session.close()
+    return lat, lng
+
 def drop_database(dbname):
 	engine = create_engine(_get_complete_database_name(dbname))
 	meta = MetaData(bind=engine)
