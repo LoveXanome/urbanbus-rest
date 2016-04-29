@@ -181,7 +181,7 @@ def _agency_exist(session, id, name):
 
 
 def _is_urban(route):
-    return decret_2015_1610(route.trips)
+    return decret_2015_1610(route.trips, False)
 
 def _create_urban_table(full_dbname):
     engine = create_engine(full_dbname)
