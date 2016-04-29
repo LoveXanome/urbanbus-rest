@@ -13,6 +13,8 @@ from services.check_urban import get_urban_status
 from services.display_routes_details import get_routes_details
 from services.display_route_details import get_route_details
 from flask.ext.cors import CORS
+from utils.timer import get_time
+from utils.logger import log_performance
 
 app = Flask(__name__)
 CORS(app)
@@ -47,10 +49,15 @@ def display_routes(agency_id):
 
 @app.route("/agencies/<int:agency_id>/routes/urban", methods=['GET'])
 def display_urban(agency_id):
+    start = get_time()
     try:
-        return jsonify({ "routes": get_urban_status(agency_id)})
+        response = jsonify({ "routes": get_urban_status(agency_id)})
     except Exception as e:
-        return error(str(e))
+        response = error(str(e))
+    finally:
+        end = get_time()
+        log_performance(start, end, "| nb routes = "+" |", "performance.log")
+        return response
 
 @app.route("/agencies/<int:agency_id>/routes/details", methods=['GET'])
 def display_details(agency_id):
