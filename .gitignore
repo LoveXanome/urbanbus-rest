@@ -72,3 +72,4 @@ tmp/
 *.pyproj
 bin/
 obj/
+*.sln

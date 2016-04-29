@@ -31,12 +31,14 @@ def add_gtfs_to_db(file):
 		for old_id in old_dataset_ids:
 			db.delete_dataset(old_id)
 			
-		# Create URBAN table + calculate	
 	except Exception as e:
 		db.drop_database(dbname)
 		# TODO delete all created stuff and put db in old state
-		errormsg = "Error loading gtfs zip file: {0}".format(str(e))
-	return errormsg
+		raise Exception("Error loading gtfs zip file: {0}".format(str(e)))
+	return dbname
+
+def calculate_urban(dbname):
+    db.create_and_fill_urban_table(dbname)
 
 
 def _filename_to_dbname(filename):

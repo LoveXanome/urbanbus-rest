@@ -31,13 +31,13 @@ def upload_file():
     if request.headers['Content-Type'] != 'application/octet-stream':
         abort(400)
     filename = upload_gtfs.savefile(request.data)
-    errormsg = upload_gtfs.add_gtfs_to_db(filename)
-    
-    if errormsg:
-        return error(errormsg)
-    
-    return jsonify({"status": 201}), 201 
+    try:
+        database_name = upload_gtfs.add_gtfs_to_db(filename)
+        upload_gtfs.calculate_urban(database_name)
+    except Exception as e:
+        error(str(e))
 
+    return jsonify({"status": 201}), 201
 
 @app.route("/agencies/<int:agency_id>/routes", methods=['GET'])
 def display_routes(agency_id):
