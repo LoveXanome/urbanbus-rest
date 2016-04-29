@@ -40,7 +40,7 @@ def upload_file():
 @app.route("/agencies/<int:agency_id>/routes", methods=['GET'])
 def display_routes(agency_id):
     try:
-        return jsonify({'data': get_routes(agency_id)})
+        return jsonify({'data': get_routes(agency_id, 2)})
     except Exception as e:
         return error(str(e))
 
@@ -67,4 +67,5 @@ def display_insee():
 
 if __name__ == "__main__":
     init_db()
-    app.run(host='0.0.0.0', debug=True)
+    #app.run(host='0.0.0.0', debug=True)
+    app.run(debug=True)

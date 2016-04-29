@@ -4,15 +4,17 @@ from database.database_access import get_dao
 from gtfslib.model import Route
 from services.check_urban import check_urban_category
 
-def get_routes(agency_id):
+def get_routes(agency_id, limit):
 	dao = get_dao(agency_id)
 	data = dict()
 	parsedRoutes = list()
 	data['agency'] = "TAN"
 	data['location'] = {'lat': 48.6843900, 'lng': 6.1849600}
-
+	countRoutes = 0
 	for route in dao.routes(fltr=Route.route_type == Route.TYPE_BUS):
-		print(route)
+		countRoutes += 1
+		if countRoutes > limit:
+			break
 		parsedRoute = dict()
 		parsedRoute["id"] = route.route_id
 		parsedRoute["name"] = route.route_long_name
