@@ -267,7 +267,7 @@ def _insert_urban(session, route_id, is_urban):
     session.commit()
 
 def _database_op(dbname, create=True, drop=False):
-    if config.DATABASE ==  config.POSTGRE:
+    if config.DATABASE == config.POSTGRE:
         db_engine = create_engine(_get_complete_database_name("postgres"))
         connection = db_engine.connect()
         connection.execute("commit")
