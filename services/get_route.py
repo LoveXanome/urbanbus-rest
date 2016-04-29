@@ -23,6 +23,7 @@ def get_route(agency_id, routeId):
 			
 	return parsedRoute
 
+
 '''	Private methods '''
 
 def _get_route_shapepoints(dao, shapeId, listPoints):
@@ -37,8 +38,7 @@ def _get_route_shapepoints(dao, shapeId, listPoints):
 			parsedPoint['id'] = str(point.feed_id)+str(point.shape_id)+str(point.shape_pt_sequence)
 			parsedPoint['name'] = "no_name"
 			parsedPoint['is_stop'] = False
-			parsedPoint['lat'] = point.shape_pt_lat
-			parsedPoint['lng'] = point.shape_pt_lon
+			parsedPoint['location'] = {'lat': point.shape_pt_lat, 'lng': point.shape_pt_lon}
 			listPoints.append(parsedPoint)
 
 	print('Nb shape points = '+str(countPoints))
@@ -58,8 +58,7 @@ def _get_route_stops(dao, tripId, listPoints):
 			parsedStop['id'] = stop.stop_id
 			parsedStop['name'] = stop.stop_name
 			parsedStop['is_stop'] = True
-			parsedStop['lat'] = stop.stop_lat
-			parsedStop['lng'] = stop.stop_lon
+			parsedStop['location'] = {'lat': stop.stop_lat, 'lng': stop.stop_lon}
 			if not _check_already_in(listPoints, parsedStop):
 				listPoints.append(parsedStop)
 
@@ -68,11 +67,11 @@ def _get_route_stops(dao, tripId, listPoints):
 
 
 def _same_position(pointA, pointB):
-	return pointA.get('lat') == pointB.get('lat') and pointA.get('lng') == pointB.get('lng')
+	return pointA['location'].get('lat') == pointB['location'].get('lat') and pointA['location'].get('lng') == pointB['location'].get('lng')
 
 def _set_is_stop(pointToModifiy, stop):
 	pointToModifiy['is_stop'] = True
-	pointToModifiy['name'] = "tralala"
+	pointToModifiy['name'] = stop['name']
 	pointToModifiy['id'] = stop['id']
 
 def _check_already_in(points, aPoint):
