@@ -137,10 +137,10 @@ def get_random_mean_lat_lng(dbname):
             results.append(r)
   
         nb_points = min(len(results), 50)
-        print(nb_points, flush=True)
+        print(nb_points)
         for i in range(nb_points):
             rand_i = randint(0, len(results)-1)
-            print(rand_i, flush=True)
+            print(rand_i)
             selected.append(results[rand_i])
 
     if nb_points == 0:
