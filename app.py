@@ -12,8 +12,10 @@ from database.database_access import init_db
 from services.display_insee import get_insee
 from services.check_urban import get_urban_status
 from services.display_routes_details import get_routes_details
+from flask.ext.cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 def error(message):
     return jsonify({"error": message}), 400
@@ -67,4 +69,5 @@ def display_insee():
 
 if __name__ == "__main__":
     init_db()
-    app.run(host='0.0.0.0', debug=True)
+    #app.run(host='0.0.0.0', debug=True)
+    app.run(debug=True)
