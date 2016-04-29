@@ -9,9 +9,9 @@ from services import upload_gtfs
 from services.display_routes import get_routes
 from services.display_agencies import get_agencies
 from database.database_access import init_db
-from services.display_insee import get_insee
 from services.check_urban import get_urban_status
 from services.display_routes_details import get_routes_details
+from services.display_route_details import get_route_details
 
 app = Flask(__name__)
 
@@ -58,11 +58,14 @@ def display_details(agency_id):
     # except Exception as e:
     #     return error(str(e))
     return jsonify({ "routes": get_routes_details(agency_id, 6)})
-
-
-@app.route("/insee", methods=['GET'])
-def display_insee():
-	return jsonify({ "population": get_insee()})
+	
+@app.route("/agencies/<int:agency_id>/routes/<int:route_id>", methods=['GET'])
+def display_detailsRoute(agency_id,route_id):
+    # try:
+    #     return jsonify({ "route": get_route_detail(agency_id,route_id)})
+    # except Exception as e:
+    #     return error(str(e))
+    return jsonify({ "route": get_route_details(agency_id,route_id)})
 
 
 if __name__ == "__main__":
