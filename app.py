@@ -35,7 +35,7 @@ def upload_file():
         database_name = upload_gtfs.add_gtfs_to_db(filename)
         upload_gtfs.calculate_urban(database_name)
     except Exception as e:
-        error(str(e))
+        return error(str(e))
 
     return jsonify({"status": 201}), 201
 

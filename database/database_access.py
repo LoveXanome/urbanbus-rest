@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, func, ForeignKey, create_engine
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Float, func, ForeignKey, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import exists
@@ -30,6 +30,8 @@ class Agency(Base):
 	id = Column(Integer, primary_key=True, nullable=False)
 	agency_id = Column(String, nullable=False)
 	agency_name = Column(String, nullable=False)
+	latitude = Column(Float, nullable=False)
+	longitude = Column(Float, nullable=False)
 	dataset = Column(Integer, ForeignKey('dataset.id'))
 	
 	def __repr__(self):
@@ -84,6 +86,7 @@ def create_dataset(dbname):
 	
 def update_agencies(new_agencies, new_dataset_id):
 	session = _get_default_db_session()
+    # TODO calculate long & lat
 	old_ids = []
 	for agency in new_agencies:
 		if _agency_exist(session, agency.agency_id, agency.agency_name):
@@ -91,7 +94,11 @@ def update_agencies(new_agencies, new_dataset_id):
 			old_ids.append(ag.dataset)
 			ag.dataset = new_dataset_id
 		else:
-			session.add(Agency(agency_id=agency.agency_id, agency_name=agency.agency_name, dataset=new_dataset_id))
+			session.add(Agency( agency_id=agency.agency_id,
+                                agency_name=agency.agency_name,
+                                latitude=TODO,
+                                longitude=TODO,
+                                dataset=new_dataset_id))
 			
 	session.commit()
 	session.close()
