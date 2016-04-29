@@ -1,11 +1,13 @@
-from sqlalchemy import Column, Integer, String, DateTime, func, ForeignKey, create_engine
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, func, ForeignKey, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import exists
 from sqlalchemy.schema import MetaData
 from gtfslib import dao
+from gtfsplugins.decret_2015_1610 import decret_2015_1610
 
 Base = declarative_base()
+GtfsBase = declarative_base()
 sessionmaker_default = None
 
 ''' Object-Database mapping '''
@@ -32,6 +34,18 @@ class Agency(Base):
 	
 	def __repr__(self):
 		return "<Agency(id='{0}', agency_id='{1}', agency_name='{2}', dataset='{3}')>".format(self.id, self.agency_id, self.agency_name, self.dataset)
+
+class Urban(GtfsBase):
+    __tablename__ = 'urban'
+    __table_args__ = {'useexisting': True, 'sqlite_autoincrement': True}
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    category = Column(Boolean, nullable=True)
+    route = Column(Integer, nullable=False, unique=True) # TODO ForeignKey on mapper in gtfslib.orm
+
+    def __repr__(self):
+        return "<Urban(id='{0}', category='{1}', route='{2}')>".format(self.id, self.category, self.route)
+
 
 ''' "public" functions '''
 
@@ -100,6 +114,45 @@ def drop_database(dbname):
 	meta = MetaData(bind=engine)
 	meta.drop_all(checkfirst=False) # TODO doesn't really work. Database still full.
 
+# Functions for urban table
+def create_and_fill_urban_table(dbname):
+    full_dbname = _get_complete_database_name(dbname)
+    engine = _create_urban_table(full_dbname)
+    sessionmk = sessionmaker(bind=engine)
+    session = sessionmk()
+
+    dbdao = dao.Dao(full_dbname)
+    for route in dbdao.routes(prefetch_trips=True):
+        urban = _is_urban(route)
+        _insert_urban(session, route.route_id, urban)
+    session.close()
+
+def get_urban(agency_id):
+    database_name = _retrieve_database(agency_id)
+    complete_db_name = _get_complete_database_name(database_name)
+    engine = create_engine(complete_db_name)
+    sessionmk = sessionmaker(bind=engine)
+    session = sessionmk()
+
+    urban_result = {}
+    for urb in session.query(Urban).all():
+        urban_result[urb.route] = urb.category
+    session.close()
+    return urban_result
+
+def get_urban_by_id(agency_id, route_id):
+    database_name = _retrieve_database(agency_id)
+    complete_db_name = _get_complete_database_name(database_name)
+    engine = create_engine(complete_db_name)
+    sessionmk = sessionmaker(bind=engine)
+    session = sessionmk()
+
+    urban_result = []
+    for urb in session.query(Urban).filter(Urban.route==route_id):
+        urban_result.append(urb)
+    session.close()
+    return urban_result[0].category
+
 ''' "private" functions '''
 
 def _get_default_db_session():
@@ -138,3 +191,18 @@ def _agency_exist(session, id, name):
 	for a in session.query(Agency).filter(Agency.agency_id == id, Agency.agency_name == name):
 		result.append(a)
 	return len(result) != 0
+
+
+def _is_urban(route):
+    return decret_2015_1610(route.trips, False)
+
+def _create_urban_table(full_dbname):
+    engine = create_engine(full_dbname)
+    GtfsBase.metadata.create_all(engine)
+    return engine
+
+
+def _insert_urban(session, route_id, is_urban):
+    u = Urban(route=route_id, category=is_urban)
+    session.add(u)
+    session.commit()

@@ -12,8 +12,10 @@ from database.database_access import init_db
 from services.check_urban import get_urban_status
 from services.display_routes_details import get_routes_details
 from services.display_route_details import get_route_details
+from flask.ext.cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 def error(message):
     return jsonify({"error": message}), 400
@@ -29,18 +31,18 @@ def upload_file():
     if request.headers['Content-Type'] != 'application/octet-stream':
         abort(400)
     filename = upload_gtfs.savefile(request.data)
-    errormsg = upload_gtfs.add_gtfs_to_db(filename)
-    
-    if errormsg:
-        return error(errormsg)
-    
-    return jsonify({"status": 201}), 201 
+    try:
+        database_name = upload_gtfs.add_gtfs_to_db(filename)
+        upload_gtfs.calculate_urban(database_name)
+    except Exception as e:
+        error(str(e))
 
+    return jsonify({"status": 201}), 201
 
 @app.route("/agencies/<int:agency_id>/routes", methods=['GET'])
 def display_routes(agency_id):
     try:
-        return jsonify({'routes': get_routes(agency_id)})
+        return jsonify({'data': get_routes(agency_id, 2)})
     except Exception as e:
         return error(str(e))
 
@@ -70,4 +72,5 @@ def display_detailsRoute(agency_id,route_id):
 
 if __name__ == "__main__":
     init_db()
-    app.run(host='0.0.0.0', debug=True)
+    #app.run(host='0.0.0.0', debug=True)
+    app.run(debug=True)
