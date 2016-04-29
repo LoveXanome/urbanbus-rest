@@ -40,11 +40,11 @@ class Urban(GtfsBase):
     __table_args__ = {'useexisting': True, 'sqlite_autoincrement': True}
 
     id = Column(Integer, primary_key=True, nullable=False)
-    urban = Column(Boolean, nullable=True)
-    route = Column(Integer, nullable=False) # TODO ForeignKey on mapper in gtfslib.orm
+    category = Column(Boolean, nullable=True)
+    route = Column(Integer, nullable=False, unique=True) # TODO ForeignKey on mapper in gtfslib.orm
 
     def __repr__(self):
-        return "<Urban(id='{0}', urban='{1}', route='{2}')>".format(self.id, self.urban, self.route)
+        return "<Urban(id='{0}', category='{1}', route='{2}')>".format(self.id, self.category, self.route)
 
 
 ''' "public" functions '''
@@ -134,11 +134,24 @@ def get_urban(agency_id):
     sessionmk = sessionmaker(bind=engine)
     session = sessionmk()
 
-    urban_result = []
+    urban_result = {}
     for urb in session.query(Urban).all():
-        urban_result.append(urb)
+        urban_result[urb.route] = urb.category
     session.close()
     return urban_result
+
+def get_urban_by_id(agency_id, route_id):
+    database_name = _retrieve_database(agency_id)
+    complete_db_name = _get_complete_database_name(database_name)
+    engine = create_engine(complete_db_name)
+    sessionmk = sessionmaker(bind=engine)
+    session = sessionmk()
+
+    urban_result = []
+    for urb in session.query(Urban).filter(Urban.route==route_id):
+        urban_result.append(urb)
+    session.close()
+    return urban_result[0].category
 
 ''' "private" functions '''
 
@@ -190,6 +203,6 @@ def _create_urban_table(full_dbname):
 
 
 def _insert_urban(session, route_id, is_urban):
-    u = Urban(route=route_id, urban=is_urban)
+    u = Urban(route=route_id, category=is_urban)
     session.add(u)
     session.commit()
