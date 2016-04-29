@@ -40,7 +40,7 @@ def upload_file():
 @app.route("/agencies/<int:agency_id>/routes", methods=['GET'])
 def display_routes(agency_id):
     try:
-        return jsonify({'routes': get_routes(agency_id)})
+        return jsonify({'data': get_routes(agency_id)})
     except Exception as e:
         return error(str(e))
 
