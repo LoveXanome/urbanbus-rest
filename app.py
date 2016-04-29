@@ -67,4 +67,4 @@ def display_insee():
 
 if __name__ == "__main__":
     init_db()
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
