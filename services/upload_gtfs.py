@@ -20,6 +20,7 @@ def savefile(filedata):
 
 def add_gtfs_to_db(file):
 	dbname = _filename_to_dbname(file)
+	db.create_db(dbname)
 	dao = db.access_direct_dao(dbname)
 	
 	errormsg = None
