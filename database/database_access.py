@@ -50,6 +50,15 @@ class Urban(GtfsBase):
 ''' "public" functions '''
 
 def init_db():
+	db_engine = create_engine("postgresql://gtfs_user:mypass@localhost/postgres")
+	connection = db_engine.connect()
+	connection.execute("commit")
+	try:
+		connection.execute("CREATE DATABASE general")
+	except:
+		pass
+	connection.close()
+
 	engine = create_engine(_get_default_database_name())
 	global sessionmaker_default
 	sessionmaker_default = sessionmaker(bind=engine)
@@ -67,6 +76,16 @@ def get_all_agencies():
 		agencies.append(row)
 	session.close()
 	return agencies
+
+def create_db(dbname):
+	db_engine = create_engine("postgresql://gtfs_user:mypass@localhost/postgres")
+	connection = db_engine.connect()
+	connection.execute("commit")
+	try:
+		connection.execute("CREATE DATABASE {0}".format(dbname))
+	except:
+		pass
+	connection.close()
 	
 def access_direct_dao(dbname):
 	return dao.Dao(_get_complete_database_name(dbname))	
@@ -110,9 +129,14 @@ def delete_dataset(id):
 	pass
 	
 def drop_database(dbname):
-	engine = create_engine(_get_complete_database_name(dbname))
-	meta = MetaData(bind=engine)
-	meta.drop_all(checkfirst=False) # TODO doesn't really work. Database still full.
+	db_engine = create_engine("postgresql://gtfs_user:mypass@localhost/postgres")
+	connection = db_engine.connect()
+	connection.execute("commit")
+	try:
+		connection.execute("DROP DATABASE dbname")
+	except:
+		pass
+	connection.close()
 
 # Functions for urban table
 def create_and_fill_urban_table(dbname):
@@ -184,7 +208,8 @@ def _get_default_database_name():
 	return _get_complete_database_name("general")
 
 def _get_complete_database_name(database):
-	return "sqlite:///database/{0}.sqlite".format(database) # TODO conf file for database
+	#return "sqlite:///database/{0}.sqlite".format(database) # TODO conf file for database
+	return "postgresql://gtfs_user:mypass@localhost/{0}".format(database)
 
 def _agency_exist(session, id, name):
 	result = []
