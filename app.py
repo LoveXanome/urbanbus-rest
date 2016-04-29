@@ -51,12 +51,15 @@ def display_routes(agency_id):
 def display_urban(agency_id):
     start = get_time()
     try:
-        response = jsonify({ "routes": get_urban_status(agency_id)})
+        routes = get_urban_status(agency_id)
+        nbRoutes = len(routes)
+        response = jsonify({ "routes": routes})
     except Exception as e:
         response = error(str(e))
     finally:
         end = get_time()
-        log_performance(start, end, "| nb routes = "+" |", "performance.log")
+        params = "| nb routes = "+str(nbRoutes)+" | endpoint = /routes/urban"
+        log_performance(start, end, params, "performance.log")
         return response
 
 @app.route("/agencies/<int:agency_id>/routes/details", methods=['GET'])
