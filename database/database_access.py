@@ -5,6 +5,8 @@ from sqlalchemy.sql import exists
 from sqlalchemy.schema import MetaData
 from gtfslib import dao
 from gtfsplugins.decret_2015_1610 import decret_2015_1610
+import config
+from os import remove
 
 Base = declarative_base()
 GtfsBase = declarative_base()
@@ -50,19 +52,12 @@ class Urban(GtfsBase):
 ''' "public" functions '''
 
 def init_db():
-	db_engine = create_engine("postgresql://gtfs_user:mypass@localhost/postgres")
-	connection = db_engine.connect()
-	connection.execute("commit")
-	try:
-		connection.execute("CREATE DATABASE general")
-	except:
-		pass
-	connection.close()
+    _database_op("general", create=True)
 
-	engine = create_engine(_get_default_database_name())
-	global sessionmaker_default
-	sessionmaker_default = sessionmaker(bind=engine)
-	Base.metadata.create_all(engine)
+    engine = create_engine(_get_default_database_name())
+    global sessionmaker_default
+    sessionmaker_default = sessionmaker(bind=engine)
+    Base.metadata.create_all(engine)
 
 def get_dao(agency_id):
 	database_name = _retrieve_database(agency_id)
@@ -78,14 +73,7 @@ def get_all_agencies():
 	return agencies
 
 def create_db(dbname):
-	db_engine = create_engine("postgresql://gtfs_user:mypass@localhost/postgres")
-	connection = db_engine.connect()
-	connection.execute("commit")
-	try:
-		connection.execute("CREATE DATABASE {0}".format(dbname))
-	except:
-		pass
-	connection.close()
+    _database_op(dbname, create=True)
 	
 def access_direct_dao(dbname):
 	return dao.Dao(_get_complete_database_name(dbname))	
@@ -129,14 +117,7 @@ def delete_dataset(id):
 	pass
 	
 def drop_database(dbname):
-	db_engine = create_engine("postgresql://gtfs_user:mypass@localhost/postgres")
-	connection = db_engine.connect()
-	connection.execute("commit")
-	try:
-		connection.execute("DROP DATABASE dbname")
-	except:
-		pass
-	connection.close()
+    _database_op(dbname, create=False, drop=True)
 
 # Functions for urban table
 def create_and_fill_urban_table(dbname):
@@ -208,8 +189,11 @@ def _get_default_database_name():
 	return _get_complete_database_name("general")
 
 def _get_complete_database_name(database):
-	#return "sqlite:///database/{0}.sqlite".format(database) # TODO conf file for database
-	return "postgresql://gtfs_user:mypass@localhost/{0}".format(database)
+    if config.DATABASE == config.POSTGRE:
+        return "postgresql://{0}:{1}@localhost/{2}".format(config.POSTGRE_USER, config.POSTGRE_PASS, database)
+    if config.DATABASE == config.SQLITE:
+        return "sqlite:///database/{0}.sqlite".format(database)
+
 
 def _agency_exist(session, id, name):
 	result = []
@@ -231,3 +215,22 @@ def _insert_urban(session, route_id, is_urban):
     u = Urban(route=route_id, category=is_urban)
     session.add(u)
     session.commit()
+
+def _database_op(dbname, create=True, drop=False):
+    if config.DATABASE ==  config.POSTGRE:
+        db_engine = create_engine(_get_complete_database_name("postgres"))
+        connection = db_engine.connect()
+        connection.execute("commit")
+        try:
+            if create:
+                connection.execute('CREATE DATABASE "{0}"'.format(dbname))
+            if drop:
+                connection.execute('DROP DATABASE "{0}"'.format(dbname))
+        except:
+            pass
+        connection.close()
+    elif config.DATABASE == config.SQLITE:
+        if create:
+            create_engine(_get_complete_database_name(dbname))
+        if drop:
+            remove("database/{0}.sqlite".format(dbname))
