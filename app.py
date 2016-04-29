@@ -5,16 +5,22 @@ gtfslibpath = os.path.join(os.getcwd(), 'gtfslib-python')
 sys.path.append(gtfslibpath)
 
 from flask import Flask, request, abort, jsonify
+from flask.ext.cors import CORS
+
+from utils.timer import get_time
+from utils.logger import log_performance
+
+from database.database_access import init_db
+
 from services import upload_gtfs
 from services.display_routes import get_routes
 from services.display_agencies import get_agencies
-from database.database_access import init_db
 from services.check_urban import get_urban_status
 from services.display_routes_details import get_routes_details
 from services.display_route_details import get_route_details
-from flask.ext.cors import CORS
-from utils.timer import get_time
-from utils.logger import log_performance
+from services.get_route import get_route
+
+
 
 app = Flask(__name__)
 CORS(app)
@@ -77,7 +83,8 @@ def display_detailsRoute(agency_id,route_id):
     #     return jsonify({ "route": get_route_detail(agency_id,route_id)})
     # except Exception as e:
     #     return error(str(e))
-    return jsonify({ "route": get_route_details(agency_id,route_id)})
+    #return jsonify({ "route": get_route_details(agency_id,route_id)})
+    return jsonify({ "route": get_route(agency_id,route_id)})
 
 
 if __name__ == "__main__":

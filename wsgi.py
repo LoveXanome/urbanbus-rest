@@ -1,8 +1,8 @@
 import sys
 import os
 
-sys.path.insert(0, '/var/www/urbanbus-rest/')
-sys.path.append('/var/www/urbanbus-rest/gtfslib-python/')
+sys.path.insert(0, '/home/quentin/src/urbanbus-rest/')
+sys.path.append('/home/quentin/src/urbanbus-rest/gtfslib-python/')
 
 from database.database_access import init_db
 init_db()
