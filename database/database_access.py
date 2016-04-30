@@ -76,6 +76,14 @@ def get_all_agencies():
 	session.close()
 	return agencies
 
+def get_agency_by_id(agency_id):
+    session = _get_default_db_session()
+    agencies = []
+    for row in session.query(Agency).filter(Agency.id==agency_id):
+        agencies.append(row)
+    session.close()
+    return agencies[0]
+
 def create_db(dbname):
     _database_op(dbname, create=True)
 	

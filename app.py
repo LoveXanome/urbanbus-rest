@@ -12,6 +12,7 @@ from database.database_access import init_db
 from services import upload_gtfs
 from services.service_handler import call_service
 from services.get_agencies import get_agencies
+from services.get_agency import get_agency
 from services.display_routes import get_routes
 from services.get_route import get_route
 
@@ -43,6 +44,13 @@ def upload_file():
 @app.route("/agencies", methods=['GET'])
 def display_agencies():
     return call_service(get_agencies, "agencies")
+
+
+@app.route("/agencies/<int:agency_id>", methods=['GET'])
+def display_agency(agency_id):
+    # params = { 'agency_id': agency_id }
+    # return call_service(get_agency, "agency", **params)
+    return get_agency(agency_id)
 
 
 @app.route("/agencies/<int:agency_id>/routes", methods=['GET'])
