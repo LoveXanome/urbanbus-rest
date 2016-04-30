@@ -4,15 +4,15 @@ from .timer import get_date, get_diff
 import config
 
 def read_file(filePath):
-	with open(filePath, 'rb') as file:
+	with open(filePath, 'r') as file:
 		print(file.read())
 
 def append_content(filePath, content):
-	with open(filePath, 'ab') as file:
+	with open(filePath, 'a') as file:
 		file.write(content+'\n')
 
 def write_content(filePath, content):
-	with open(filePath, 'wb') as file:
+	with open(filePath, 'w') as file:
 		file.write(content+'\n')
 
 def log_performance(start, end, params, filePath):

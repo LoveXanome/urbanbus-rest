@@ -10,7 +10,7 @@ def call_service(functionToRun, responseType, **kwargs):
     try:
         response = jsonify({ responseType: functionToRun(**kwargs) })
     except Exception as e:
-        response = jsonify({ 'error': str(e) })
+        response = jsonify({ 'error': str(e) }), 400
     finally:
         end = get_time()
         params = "| GET endpoint = /"+responseType+" | "+str(kwargs)

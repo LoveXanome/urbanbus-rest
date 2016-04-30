@@ -7,9 +7,6 @@ sys.path.append(gtfslibpath)
 from flask import Flask, request, abort, jsonify
 from flask.ext.cors import CORS
 
-from utils.timer import get_time
-from utils.logger import log_performance
-
 from database.database_access import init_db
 
 from services import upload_gtfs
@@ -17,7 +14,6 @@ from services.service_handler import call_service
 from services.get_agencies import get_agencies
 from services.display_routes import get_routes
 from services.get_route import get_route
-from services.display_route_details import get_route_details
 
 
 app = Flask(__name__)
@@ -27,7 +23,7 @@ def error(message):
     return jsonify({"error": message}), 400
 
 
-# Example curl -i -H "Content-Type: application/octet-stream" -X POST --data-binary @nantes.zip http://localhost:5000/upload/gtfs
+# Example: curl -i -H "Content-Type: application/octet-stream" -X POST --data-binary @nantes.zip http://localhost:5000/upload/gtfs
 @app.route("/upload/gtfs", methods=['PUT', 'POST'])
 def upload_file():
     if request.headers['Content-Type'] != 'application/octet-stream':
@@ -51,7 +47,7 @@ def display_agencies():
 
 @app.route("/agencies/<int:agency_id>/routes", methods=['GET'])
 def display_routes(agency_id):
-    params = { 'agency_id': agency_id, 'limit': 2 }
+    params = { 'agency_id': agency_id }
     return call_service(get_routes, "data", **params)
 
 	
