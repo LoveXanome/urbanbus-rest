@@ -25,11 +25,11 @@ PRINT_PERF = False
 ### [GET] /agencies
 To list all agencies available
 
-### [GET] /agencies/<agency_id>
+### [GET] /agencies/agency_id
 To get details about an agency
 
-### [GET] /agencies/<agency_id>/routes
+### [GET] /agencies/agency_id/routes
 To list all routes available for a given agency
 
-### [GET] /agencies/<agency_id>/routes/<route_id>
+### [GET] /agencies/agency_id/routes/<route_id>
 To get details about a particular route
