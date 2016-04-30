@@ -76,3 +76,6 @@ obj/
 
 # Configuration file
 config.py
+
+# IntelliJ
+.idea/

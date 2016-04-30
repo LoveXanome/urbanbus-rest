@@ -46,7 +46,7 @@ class Urban(GtfsBase):
 
     id = Column(Integer, primary_key=True, nullable=False)
     category = Column(Boolean, nullable=True)
-    route = Column(Integer, nullable=False, unique=True) # TODO ForeignKey on mapper in gtfslib.orm
+    route = Column(String, nullable=False, unique=True) # TODO ForeignKey on mapper in gtfslib.orm
 
     def __repr__(self):
         return "<Urban(id='{0}', category='{1}', route='{2}')>".format(self.id, self.category, self.route)
@@ -137,10 +137,8 @@ def get_random_mean_lat_lng(dbname):
             results.append(r)
   
         nb_points = min(len(results), 50)
-        print(nb_points)
         for i in range(nb_points):
             rand_i = randint(0, len(results)-1)
-            print(rand_i)
             selected.append(results[rand_i])
 
     if nb_points == 0:
@@ -164,7 +162,7 @@ def get_lat_lng(agency_id):
         lng = r.longitude
         break
     session.close()
-    return lat, lng
+    return {'lat': lat, 'lng': lng}
 
 def drop_database(dbname):
     _database_op(dbname, create=False, drop=True)
