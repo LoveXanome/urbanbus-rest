@@ -1,24 +1,21 @@
 # -*- coding: utf-8 -*-
 
-from database.database_access import get_dao
 from gtfslib.model import Route, StopTime, Shape
-from gtfsplugins import decret_2015_1610
-from database.database_access import get_dao
-from services.check_urban import check_urban_category
+from database.database_access import get_dao, get_urban_by_id
 
-def get_route(agency_id, routeId):
+def get_route(agency_id, route_id):
 	dao = get_dao(agency_id)
 	parsedRoute = dict()
 	listPoints = list()
 
-	route = dao.routes(fltr=Route.route_id == routeId)
-	print(route)
-	parsedRoute["id"] = route[0].route_id
-	parsedRoute["name"] = route[0].route_long_name
-	parsedRoute["category"] = check_urban_category(route[0].trips)
+	route = dao.routes(fltr=Route.route_id == route_id)[0]
+	print(route, flush=True)
+	parsedRoute["id"] = route.route_id
+	parsedRoute["name"] = route.route_long_name
+	parsedRoute["category"] = get_urban_by_id(agency_id, route.route_id)
 	# All trips have same trip_id so we may use only the first : route.trips[0]
-	_get_route_shapepoints(dao, route[0].trips[0].shape_id, listPoints)
-	_get_route_stops(dao, route[0].trips[0].trip_id, listPoints)
+	_get_route_shapepoints(dao, route.trips[0].shape_id, listPoints)
+	_get_route_stops(dao, route.trips[0].trip_id, listPoints)
 	parsedRoute['points'] = listPoints
 			
 	return parsedRoute
