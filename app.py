@@ -84,7 +84,7 @@ def display_detailsRoute(agency_id,route_id):
     # except Exception as e:
     #     return error(str(e))
     #return jsonify({ "route": get_route_details(agency_id,route_id)})
-    return jsonify({ "route": get_route(agency_id,route_id)})
+    return jsonify({ "route": get_route(agency_id, route_id)})
 
 
 if __name__ == "__main__":
