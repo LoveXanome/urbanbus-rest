@@ -13,7 +13,7 @@ from services import upload_gtfs
 from services.service_handler import call_service
 from services.get_agencies import get_agencies
 from services.get_agency import get_agency
-from services.display_routes import get_routes
+from services.get_routes import get_routes
 from services.get_route import get_route
 
 
