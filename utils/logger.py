@@ -4,7 +4,7 @@ from .timer import get_date, get_diff
 
 def read_file(filePath):
 	with open(filePath, 'rb') as file:
-		print file.read()
+		print(file.read())
 
 def append_content(filePath, content):
 	with open(filePath, 'ab') as file:
