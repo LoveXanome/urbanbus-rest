@@ -51,22 +51,17 @@ def upload_file():
 def display_agencies():
     return call_service(get_agencies, "agencies")
 
+
 @app.route("/agencies/<int:agency_id>/routes", methods=['GET'])
 def display_routes(agency_id):
     params = { 'agency_id': agency_id, 'limit': 2 }
-    return call_service(get_routes, "routes", **params)
+    return call_service(get_routes, "data", **params)
 
 	
 @app.route("/agencies/<int:agency_id>/routes/<int:route_id>", methods=['GET'])
-def display_detailsRoute(agency_id,route_id):
-    # try:
-    #     return jsonify({ "route": get_route_detail(agency_id,route_id)})
-    # except Exception as e:
-    #     return error(str(e))
-    #return jsonify({ "route": get_route_details(agency_id,route_id)})
-    return jsonify({ "route": get_route(agency_id, route_id)})
-
-
+def display_route(agency_id, route_id):
+    params = { 'agency_id': agency_id, 'route_id': route_id }
+    return call_service(get_route, "route", **params)
 
 
 if __name__ == "__main__":

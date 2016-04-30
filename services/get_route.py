@@ -13,6 +13,7 @@ def get_route(agency_id, route_id):
 	parsedRoute["short_name"] = route.route_short_name
 	parsedRoute["name"] = route.route_long_name
 	parsedRoute["category"] = check_urban_category(route.trips)
+
 	# All trips have same trip_id so we may use only the first : route.trips[0]
 	_get_route_shapepoints(dao, route.trips[0].shape_id, listPoints)
 	_get_route_stops(dao, route.trips[0].trip_id, listPoints)
