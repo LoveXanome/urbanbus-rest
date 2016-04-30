@@ -14,13 +14,10 @@ from database.database_access import init_db
 
 from services import upload_gtfs
 from services.service_handler import call_service
+from services.get_agencies import get_agencies
 from services.display_routes import get_routes
-from services.display_agencies import get_agencies
-from services.check_urban import get_urban_status
-from services.display_routes_details import get_routes_details
-from services.display_route_details import get_route_details
 from services.get_route import get_route
-
+from services.display_route_details import get_route_details
 
 
 app = Flask(__name__)

@@ -6,8 +6,9 @@ from gtfslib.dao import Dao
 
 def get_agencies():
 	agencies = database_access.get_all_agencies()
-	agencies_list = [None] * len(agencies)
-	for i in range(len(agencies)):
-		agencies_list[i] = {'name': agencies[i].agency_name, 'id': agencies[i].id}
+	agencies_list = list()
+	
+	for agency in agencies:
+		agencies_list.append({'name': agency.agency_name, 'id': agency.id})
 		
 	return agencies_list	
