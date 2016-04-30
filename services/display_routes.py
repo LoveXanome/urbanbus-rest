@@ -19,6 +19,7 @@ def get_routes(agency_id, limit=None):
 			break
 		parsedRoute = dict()
 		parsedRoute["id"] = route.route_id
+		parsedRoute["short_name"] = route.route_short_name
 		parsedRoute["name"] = route.route_long_name
 		parsedRoute["category"] = urban_routes[route.route_id]
 		parsedRoutes.append(parsedRoute)

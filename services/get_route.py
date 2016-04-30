@@ -8,11 +8,11 @@ def get_route(agency_id, route_id):
 	parsedRoute = dict()
 	listPoints = list()
 
-	route = dao.routes(fltr=Route.route_id == route_id)[0]
-	print(route, flush=True)
+	route = dao.routes(fltr=Route.route_id == routeId)[0]
 	parsedRoute["id"] = route.route_id
+	parsedRoute["short_name"] = route.route_short_name
 	parsedRoute["name"] = route.route_long_name
-	parsedRoute["category"] = get_urban_by_id(agency_id, route.route_id)
+	parsedRoute["category"] = check_urban_category(route.trips)
 	# All trips have same trip_id so we may use only the first : route.trips[0]
 	_get_route_shapepoints(dao, route.trips[0].shape_id, listPoints)
 	_get_route_stops(dao, route.trips[0].trip_id, listPoints)

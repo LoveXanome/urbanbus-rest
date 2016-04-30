@@ -75,7 +75,7 @@ def display_details(agency_id):
     #     return jsonify({ "routes": get_routes_details(agency_id, 6)})
     # except Exception as e:
     #     return error(str(e))
-    return jsonify({ "routes": get_routes_details(agency_id, 6)})
+    return method2(method1)
 	
 @app.route("/agencies/<int:agency_id>/routes/<int:route_id>", methods=['GET'])
 def display_detailsRoute(agency_id,route_id):
@@ -85,6 +85,14 @@ def display_detailsRoute(agency_id,route_id):
     #     return error(str(e))
     #return jsonify({ "route": get_route_details(agency_id,route_id)})
     return jsonify({ "route": get_route(agency_id, route_id)})
+
+def method1():
+    return 'hello world'
+
+def method2(methodToRun):
+    result = methodToRun()
+    return result
+
 
 
 if __name__ == "__main__":
