@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from database import database_access
+from database.database_access import get_all_agencies
 from gtfslib.model import Agency
 from gtfslib.dao import Dao
 
 def get_agencies():
-	agencies = database_access.get_all_agencies()
+	agencies = get_all_agencies()
 	agencies_list = list()
 	
 	for agency in agencies:
