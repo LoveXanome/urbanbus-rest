@@ -53,34 +53,9 @@ def display_agencies():
 
 @app.route("/agencies/<int:agency_id>/routes", methods=['GET'])
 def display_routes(agency_id):
-    # try:
-    #     return jsonify({'data': get_routes(agency_id, 2)})
-    # except Exception as e:
-    #     return error(str(e))
-    return jsonify({'data': get_routes(agency_id)})
-    
-@app.route("/agencies/<int:agency_id>/routes/urban", methods=['GET'])
-def display_urban(agency_id):
-    start = get_time()
-    try:
-        routes = get_urban_status(agency_id)
-        nbRoutes = len(routes)
-        response = jsonify({ "routes": routes})
-    except Exception as e:
-        response = error(str(e))
-    finally:
-        end = get_time()
-        params = "| nb routes = "+str(nbRoutes)+" | endpoint = /routes/urban"
-        log_performance(start, end, params, "performance.log")
-        return response
+    params = { 'agency_id': agency_id, 'limit': 2 }
+    return call_service(get_routes, "routes", **params)
 
-@app.route("/agencies/<int:agency_id>/routes/details", methods=['GET'])
-def display_details(agency_id):
-    # try:
-    #     return jsonify({ "routes": get_routes_details(agency_id, 6)})
-    # except Exception as e:
-    #     return error(str(e))
-    return method2(method1)
 	
 @app.route("/agencies/<int:agency_id>/routes/<int:route_id>", methods=['GET'])
 def display_detailsRoute(agency_id,route_id):
