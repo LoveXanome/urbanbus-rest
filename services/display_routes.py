@@ -5,10 +5,7 @@ from gtfslib.model import Route
 
 def get_routes(agency_id, limit=None):
 	dao = get_dao(agency_id)
-	data = dict()
 	parsedRoutes = list()
-	data['agency'] = "TAN"
-	data['location'] = get_lat_lng(agency_id)
 	countRoutes = 0
 
 	urban_routes = get_urban(agency_id)
@@ -24,6 +21,5 @@ def get_routes(agency_id, limit=None):
 		parsedRoute["category"] = urban_routes[route.route_id]
 		parsedRoutes.append(parsedRoute)
 
-	data['routes'] = parsedRoutes
-	return data
+	return parsedRoutes
 
