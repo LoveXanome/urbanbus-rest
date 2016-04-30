@@ -13,6 +13,7 @@ from utils.logger import log_performance
 from database.database_access import init_db
 
 from services import upload_gtfs
+from services.service_handler import call_service
 from services.display_routes import get_routes
 from services.display_agencies import get_agencies
 from services.check_urban import get_urban_status
@@ -28,9 +29,6 @@ CORS(app)
 def error(message):
     return jsonify({"error": message}), 400
 
-@app.route("/agencies", methods=['GET'])
-def display_agencies():
-	return jsonify({"agencies": get_agencies()})
 
 # Example curl -i -H "Content-Type: application/octet-stream" -X POST --data-binary @nantes.zip http://localhost:5000/upload/gtfs
 @app.route("/upload/gtfs", methods=['PUT', 'POST'])
@@ -45,6 +43,13 @@ def upload_file():
         return error(str(e))
 
     return jsonify({"status": 201}), 201
+
+
+''' GET endpoints '''
+
+@app.route("/agencies", methods=['GET'])
+def display_agencies():
+    return call_service(get_agencies, "agencies")
 
 @app.route("/agencies/<int:agency_id>/routes", methods=['GET'])
 def display_routes(agency_id):
@@ -86,12 +91,6 @@ def display_detailsRoute(agency_id,route_id):
     #return jsonify({ "route": get_route_details(agency_id,route_id)})
     return jsonify({ "route": get_route(agency_id, route_id)})
 
-def method1():
-    return 'hello world'
-
-def method2(methodToRun):
-    result = methodToRun()
-    return result
 
 
 

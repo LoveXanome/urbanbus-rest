@@ -18,9 +18,10 @@ def write_content(filePath, content):
 def log_performance(start, end, params, filePath):
 	time = get_diff(start, end)
 	date = get_date()
-	content = date + " - Execution time = " + str(time) + " - " + params
+	content = date+" - Execution time = "+str(time)+" sec "+params
 
 	if config.LOG_PERF:
 		append_content(filePath, content)
 	if config.PRINT_PERF:
 		print(content)
+
