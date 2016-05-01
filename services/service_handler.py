@@ -2,7 +2,7 @@
 
 from flask import jsonify
 from utils.timer import get_time
-from utils.logger import log_performance
+from utils.logger import log_performance, log_error
 
 def call_service(functionToRun, responseType, **kwargs):
     start = get_time()
@@ -10,6 +10,7 @@ def call_service(functionToRun, responseType, **kwargs):
     try:
         response = jsonify({ responseType: functionToRun(**kwargs) })
     except Exception as e:
+        log_error(e)
         response = jsonify({ 'error': str(e) }), 400
     finally:
         end = get_time()

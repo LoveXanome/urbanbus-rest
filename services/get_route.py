@@ -7,13 +7,12 @@ def get_route(agency_id, route_id):
 	dao = get_dao(agency_id)
 	parsedRoute = dict()
 	listPoints = list()
-	str_route_id = _convert_to_string(route_id)
 
-	route = dao.route(str_route_id)
+	route = dao.route(route_id)
 	parsedRoute["id"] = route.route_id
 	parsedRoute["short_name"] = route.route_short_name
 	parsedRoute["name"] = route.route_long_name
-	parsedRoute["category"] = get_urban_by_id(agency_id, str_route_id)
+	parsedRoute["category"] = get_urban_by_id(agency_id, route_id)
 
 	# All trips have same trip_id so we may use only the first : route.trips[0]
 	if len(route.trips) is not 0:
@@ -25,16 +24,6 @@ def get_route(agency_id, route_id):
 
 
 '''	Private methods '''
-
-def _convert_to_string(route_id):
-	''' Need to add 0 or 00 in front of route_id to find it in DB'''
-	string = str(route_id)
-	if len(string) is 2:
-		return "0"+string
-	elif len(string) is 1:
-		return "00"+string
-	else:
-		return route_id
 
 def _get_route_shapepoints(dao, shapeId, listPoints):
 	countPoints = 0

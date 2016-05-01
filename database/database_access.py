@@ -61,7 +61,10 @@ def init_db():
     global sessionmaker_default
     sessionmaker_default = sessionmaker(bind=engine)
     global Base
-    Base.metadata.create_all(engine)
+    try:
+        Base.metadata.create_all(engine)
+    except:
+        pass
 
 def get_dao(agency_id):
 	database_name = _retrieve_database(agency_id)
@@ -247,7 +250,7 @@ def _get_default_database_name():
 
 def _get_complete_database_name(database):
     if config.DATABASE == config.POSTGRE:
-        return "postgresql://{0}:{1}@localhost/{2}".format(config.POSTGRE_USER, config.POSTGRE_PASS, database)
+        return "postgresql://{0}:{1}@{2}/{3}".format(config.POSTGRE_USER, config.POSTGRE_PASS, config.POSTGRE_HOST, database)
     if config.DATABASE == config.SQLITE:
         return "sqlite:///database/{0}.sqlite".format(database)
 

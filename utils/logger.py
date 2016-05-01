@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .timer import get_date, get_diff
+import traceback
 import config
 
 def read_file(filePath):
@@ -25,3 +26,6 @@ def log_performance(start, end, params, filePath):
 	if config.PRINT_PERF:
 		print(content)
 
+def log_error(ex):
+	with open('error.log', 'a') as f:
+		traceback.print_exc(file=f)

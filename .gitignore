@@ -74,8 +74,8 @@ bin/
 obj/
 *.sln
 
-# Configuration file
-config.py
-
 # IntelliJ
 .idea/
+
+# Environment file
+.env
