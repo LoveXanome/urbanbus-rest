@@ -15,6 +15,7 @@ from services.get_agencies import get_agencies
 from services.get_agency import get_agency
 from services.get_routes import get_routes
 from services.get_route import get_route
+from utils.logger import log_error
 
 
 app = Flask(__name__)
@@ -34,6 +35,7 @@ def upload_file():
         database_name = upload_gtfs.add_gtfs_to_db(filename)
         upload_gtfs.calculate_urban(database_name)
     except Exception as e:
+        log_error(e)
         return error(str(e))
 
     return jsonify({"status": 201}), 201
@@ -62,7 +64,6 @@ def display_routes(agency_id):
 def display_route(agency_id, route_id):
     params = { 'agency_id': agency_id, 'route_id': route_id }
     return call_service(get_route, "route", **params)
-
 
 if __name__ == "__main__":
     init_db()
