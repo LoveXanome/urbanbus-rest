@@ -9,19 +9,22 @@
 
 * make create a `config.py` like :
 ```
+import os
+
 SQLITE = 1
 POSTGRE = 2
-DATABASE = SQLITE
+DATABASE = os.environ.get('DATABASE') or SQLITE
 
-POSTGRE_USER = 'gtfs_user'
-POSTGRE_PASS = 'mypass'
-POSTGRE_HOST = 'localhost'
+POSTGRE_USER = os.environ.get('POSTGRE_USER') or 'gtfs_user'
+POSTGRE_PASS = os.environ.get('POSTGRE_PASS') or 'mypass'
+POSTGRE_HOST = os.environ.get('POSTGRE_HOST') or 'localhost'
 
-SECRET_KEY = 'coucou-hibou'
+SECRET_KEY = os.environ.get('SECRET_KEY') or 'coucou-hibou'
 
 LOG_PERF = False
 PRINT_PERF = False
 ```
+
 ## List of endpoints
 ### [GET] /agencies
 To list all agencies available
