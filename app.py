@@ -58,7 +58,7 @@ def display_routes(agency_id):
     return call_service(get_routes, "routes", **params)
 
 	
-@app.route("/agencies/<int:agency_id>/routes/<int:route_id>", methods=['GET'])
+@app.route("/agencies/<int:agency_id>/routes/<route_id>", methods=['GET'])
 def display_route(agency_id, route_id):
     params = { 'agency_id': agency_id, 'route_id': route_id }
     return call_service(get_route, "route", **params)
