@@ -61,7 +61,10 @@ def init_db():
     global sessionmaker_default
     sessionmaker_default = sessionmaker(bind=engine)
     global Base
-    Base.metadata.create_all(engine)
+    try:
+        Base.metadata.create_all(engine)
+    except:
+        pass
 
 def get_dao(agency_id):
 	database_name = _retrieve_database(agency_id)
