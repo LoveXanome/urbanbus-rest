@@ -15,6 +15,7 @@ DATABASE = SQLITE
 
 POSTGRE_USER = 'gtfs_user'
 POSTGRE_PASS = 'mypass'
+POSTGRE_HOST = 'localhost'
 
 SECRET_KEY = 'coucou-hibou'
 

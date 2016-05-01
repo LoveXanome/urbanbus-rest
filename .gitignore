@@ -79,3 +79,6 @@ config.py
 
 # IntelliJ
 .idea/
+
+# Environment file
+.env

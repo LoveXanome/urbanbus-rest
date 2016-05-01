@@ -247,7 +247,7 @@ def _get_default_database_name():
 
 def _get_complete_database_name(database):
     if config.DATABASE == config.POSTGRE:
-        return "postgresql://{0}:{1}@localhost/{2}".format(config.POSTGRE_USER, config.POSTGRE_PASS, database)
+        return "postgresql://{0}:{1}@{2}/{3}".format(config.POSTGRE_USER, config.POSTGRE_PASS, config.POSTGRE_HOST, database)
     if config.DATABASE == config.SQLITE:
         return "sqlite:///database/{0}.sqlite".format(database)
 
