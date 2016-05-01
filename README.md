@@ -26,10 +26,10 @@ PRINT_PERF = False
 To list all agencies available
 
 ### [GET] /agencies/agency_id
-To get details about an agency
+To get details about an agency (agency_id is an integer)
 
 ### [GET] /agencies/agency_id/routes
 To list all routes available for a given agency
 
-### [GET] /agencies/agency_id/routes/<route_id>
-To get details about a particular route
+### [GET] /agencies/agency_id/routes/route_id
+To get details about a particular route (route_id is a string)
