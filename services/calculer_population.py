@@ -16,10 +16,10 @@ def calculer_pop():
 		urban_routes = get_urban(agency.id)
 
 		for route in dao.routes(fltr=Route.route_type == Route.TYPE_BUS):
-			parsedRoute = get_population_stops(agency.id,route.route_id)
-			listeroutes = parsedRoute['points']
+			listeroutes = get_population_stops(agency.id,route.route_id)
+			print('Insertion des stops de ' + route.route_id)
 			for stop in listeroutes :	
-				stop_id = listeroutes['id']
-				population = listeroutes['population']
+				stop_id = stop['id']
+				population = stop['population']
 				fill_population_table(agency.id, stop_id, population)
 	return True

@@ -57,10 +57,8 @@ def get_population_stops(agency_id,route_id):
 	# All trips have same trip_id so we may use only the first : route.trips[0]
 	if len(route.trips) is not 0:
 		_get_route_stops(dao, route.trips[0].trip_id, listPoints, True)
-	parsedRoute['points'] = listPoints
-	parsedRoute['population_totale'] = populationTotale
 			
-	return parsedRoute
+	return listPoints
 
 '''	Private methods '''
 
@@ -105,7 +103,7 @@ def _get_route_stops(dao, tripId, listPoints, avecPopulation = False):
 				listPoints.append(parsedStop)
 
 	print('Nb stop points = '+str(countStops))
-	return 
+	return
 
 
 def _same_position(pointA, pointB):

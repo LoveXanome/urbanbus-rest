@@ -276,7 +276,7 @@ def get_urban_by_id(agency_id, route_id):
 # Functions for population table	
 def fill_population_table(agency_id, stop_id, population):
     session = _get_default_db_session()
-    _insert_population(agency_id, stop_id, population)
+    _insert_population(session, agency_id, stop_id, population)
     session.close()
 	
 def get_population(agency_id):
@@ -358,7 +358,7 @@ def _insert_urban(session, route_id, is_urban, distance, ratio):
     session.add(u)
     session.commit()
 	
-def _insert_population(agency_id,stop_id, population):
+def _insert_population(session, agency_id,stop_id, population):
     p = Population(agency_id=agency_id, stop_id=stop_id, population=population)
     session.add(p)
     session.commit()
