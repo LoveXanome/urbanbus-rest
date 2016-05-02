@@ -73,9 +73,15 @@ tmp/
 bin/
 obj/
 *.sln
+*.config
 
 # IntelliJ
 .idea/
 
 # Environment file
 .env
+
+# INSEE data
+car_m.dbf
+rect_m.dbf
+INSEE_200m.csv

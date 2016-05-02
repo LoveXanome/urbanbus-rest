@@ -8,6 +8,7 @@ from gtfsplugins.decret_2015_1610 import decret_2015_1610
 from random import randint
 import config
 from os import remove
+from services.insee import download_insee_files
 
 Base = declarative_base()
 GtfsBase = declarative_base()
@@ -57,15 +58,14 @@ class Urban(GtfsBase):
 
 class Population(Base) :
 	__tablename__ = 'population'
-	__table_args__ = {'useexisting': True, 'sqlite_autoincrement': True}
+	__table_args__ = {'useexisting': True}
 
-	id = Column(Integer, primary_key=True, nullable=False)
-	agency_id = Column(String, nullable=False)
-	stop_id = Column(String, nullable=False)
+	dataset = Column(Integer, ForeignKey('dataset.id'), primary_key=True, nullable=False)
+	stop_id = Column(String, primary_key=True, nullable=False)
 	population = Column(Integer, nullable=True)
 	
 	def __repr__(self):
-		return "<Population(agency_id='{0}', stop_id='{1}', population='{2}')>".format(self.id, self.category, self.route)
+		return "<Population(agency_id='{0}', stop_id='{1}', population='{2}')>".format(self.agency_id, self.stop_id, self.population)
 
 ''' "public" functions '''
 
@@ -80,6 +80,7 @@ def init_db():
         Base.metadata.create_all(engine)
     except:
         pass
+    download_insee_files()
 
 def get_dao(agency_id):
 	database_name = _retrieve_database(agency_id)
@@ -99,6 +100,7 @@ def get_agency_by_id(agency_id):
     agencies = []
     for row in session.query(Agency).filter(Agency.id==agency_id):
         agencies.append(row)
+        break
     session.close()
     return agencies[0]
 
@@ -274,9 +276,9 @@ def get_urban_by_id(agency_id, route_id):
     return urban_result
 
 # Functions for population table
-def fill_population_table(agency_id, stop_id, population):
+def fill_population_table(dataset, stop_id, population):
     session = _get_default_db_session()
-    _insert_population(session, agency_id, stop_id, population)
+    _insert_population(session, dataset, stop_id, population)
     session.close()
 
 def get_population(agency_id):
@@ -294,6 +296,7 @@ def get_population_by_id(agency_id, stop_id):
     population_result = []
     for pop in session.query(Population).filter(Population.agency_id==agency.id, Population.stop_id==stop_id):
         population_result.append(pop)
+        break
     session.close()
     return population_result[0].population
 
@@ -378,8 +381,8 @@ def _insert_urban(session, route_id, is_urban, distance, ratio):
     session.add(u)
     session.commit()
 
-def _insert_population(session, agency_id,stop_id, population):
-    p = Population(agency_id=agency_id, stop_id=stop_id, population=population)
+def _insert_population(session, dataset,stop_id, population):
+    p = Population(dataset=dataset, stop_id=stop_id, population=population)
     session.add(p)
     session.commit()
 
@@ -402,3 +405,4 @@ def _database_op(dbname, create=True, drop=False):
             create_engine(_get_complete_database_name(dbname))
         if drop:
             remove("database/{0}.sqlite".format(dbname))
+

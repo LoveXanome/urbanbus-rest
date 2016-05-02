@@ -3,7 +3,13 @@
 import json
 import csv
 import subprocess
+from os import path, rename, makedirs
+from urllib.request import urlopen
+import zipfile
+from threading import Thread
+from utils.logger import log_trace
 
+TMP_DIR = "tmp/"
 
 def get_population(left,bottom,right,top):
 	command = "insee-200m-extract.bat --left "+str(left)+" --bottom "+str(bottom)+" --right "+str(right)+" --top "+str(top)+" --csv --outputPrefix INSEE_200m"
@@ -16,3 +22,42 @@ def get_population(left,bottom,right,top):
 		if row["ind"] != "ind" :
 			popTot = popTot + int(float(row["ind"]))	
 	return popTot
+
+def download_insee_files():
+    if not path.exists(TMP_DIR):
+        makedirs(TMP_DIR)
+    
+    threads = []
+    if not path.isfile("car_m.dbf"):
+        t = Thread(target=_get_file, args=("200m-carreaux-metropole.zip", "car_m.dbf",))
+        threads.append(t)
+        t.start()
+    else:
+        log_trace("car_m.dbf already exists")
+    
+    if not path.isfile("rect_m.dbf"):
+        t = Thread(target=_get_file, args=("200m-rectangles-metropole.zip", "rect_m.dbf",))
+        threads.append(t)
+        t.start()
+    else:
+        log_trace("rect_m.dbf already exists")
+    
+    for t in threads:
+        t.join()
+
+def _get_file(zipname, filename):
+    dest_zip = path.join(TMP_DIR, zipname)
+    # Download
+    log_trace("Downloading {0}".format(dest_zip))
+    file = urlopen("http://www.insee.fr/fr/ppp/bases-de-donnees/donnees-detaillees/donnees-carroyees/zip/{0}".format(zipname))
+    with open(dest_zip, 'wb') as f:
+        f.write(file.read())
+    # Unzip
+    log_trace("Unziping {0}".format(dest_zip))
+    with zipfile.ZipFile(dest_zip, 'r') as zip_ref:
+        zip_ref.extractall(TMP_DIR)
+    # Move
+    src = path.join(dest_zip[:-4], filename)
+    dest = filename
+    log_trace("Moving {0} to {1}".format(src, dest))
+    rename(src, dest)

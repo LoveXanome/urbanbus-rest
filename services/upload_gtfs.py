@@ -3,6 +3,7 @@
 from datetime import datetime
 import os
 from database import database_access as db
+from services.calculate_population import calculate_population
 from utils.logger import log_trace, log_error
 
 TMPDIR = 'tmp/'
@@ -39,6 +40,9 @@ def add_gtfs_to_db(file):
 			log_trace("Deleting old dataset...")
 			db.delete_dataset(old_id)
 		calculate_urban(dbname)
+		log_trace("Filling population database...")
+		calculate_population(dbname, dataset_id)
+
 		log_trace("Setting success...")
 		db.set_success(dataset_id)
 		log_trace("Done")

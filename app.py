@@ -17,9 +17,6 @@ from services.get_routes import get_routes
 from services.get_route import get_route
 from services.get_stop import get_stop
 from services.get_route import get_population
-from services.calculer_population import calculer_pop
-
-
 from utils.logger import log_error
 from threading import Thread
 
@@ -40,17 +37,14 @@ def upload_file():
     filename = upload_gtfs.savefile(request.data)
 
     # Launch bg task for adding gtfs to database
-    thread = Thread(target=upload_file_thread, args=(filename,))
-    thread.start()
-
-    # TODO Launch bg task for calculating population per stop
+    thread_upload = Thread(target=upload_file_thread, args=(filename,))
+    thread_upload.start()
 
     return jsonify({"status": 201}), 201
 
 def upload_file_thread(filename):
     try:
         database_name = upload_gtfs.add_gtfs_to_db(filename)
-        # Urban calcul made in function above
     except Exception as e:
         log_error(e)
         return error(str(e))
@@ -83,18 +77,11 @@ def display_routes(agency_id):
 def display_route(agency_id, route_id):
     params = { 'agency_id': agency_id, 'route_id': route_id }
     return call_service(get_route, "route", **params)
-	
 
 @app.route("/agencies/<int:agency_id>/routes/<route_id>/population", methods=['GET'])
 def display_population_route(agency_id, route_id):
 	params = { 'agency_id': agency_id, 'route_id': route_id }
 	return call_service(get_population, "population", **params)
-
-
-@app.route("/caclul_population", methods=['GET'])
-def display_caclul_population():
-	return call_service(calculer_pop, "termine_correctement")
-
 
 @app.route("/agencies/<int:agency_id>/stops/<stop_id>", methods=['GET'])
 def display_stop(agency_id, stop_id):
