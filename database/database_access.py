@@ -22,9 +22,11 @@ class Dataset(Base):
 	id = Column(Integer, primary_key=True, nullable=False)
 	database_name = Column(String, nullable=False)
 	add_date = Column(DateTime, default=func.now(), nullable=False)
+	upload_success = Column(Boolean, nullable=False, default=False)
+	upload_failed = Column(Boolean, nullable=False, default=False)
 	
 	def __repr__(self):
-		return "<Dataset(id='{0}', database_name='{1}', add_date='{2}')>".format(self.id, self.database_name, self.add_date)
+		return "<Dataset(id='{0}', database_name='{1}', add_date='{2}', upload_success='{3}', upload_failed='{4}')>".format(self.id, self.database_name, self.add_date, self.upload_success, self.upload_failed)
 	
 class Agency(Base):
 	__tablename__ = 'agency'
@@ -51,6 +53,17 @@ class Urban(GtfsBase):
     def __repr__(self):
         return "<Urban(id='{0}', category='{1}', route='{2}')>".format(self.id, self.category, self.route)
 
+class Population(Base) :
+	__tablename__ = 'population'
+	__table_args__ = {'useexisting': True, 'sqlite_autoincrement': True}
+
+	id = Column(Integer, primary_key=True, nullable=False)
+	agency_id = Column(String, nullable=False)
+	stop_id = Column(String, nullable=False)
+	population = Column(Integer, nullable=True)
+	
+	def __repr__(self):
+		return "<Population(agency_id='{0}', stop_id='{1}', population='{2}')>".format(self.id, self.category, self.route)
 
 ''' "public" functions '''
 
@@ -89,7 +102,7 @@ def get_agency_by_id(agency_id):
 
 def create_db(dbname):
     _database_op(dbname, create=True)
-	
+
 def access_direct_dao(dbname):
 	return dao.Dao(_get_complete_database_name(dbname))	
 
@@ -103,7 +116,43 @@ def create_dataset(dbname):
 	new_dataset_id = new_dataset.id
 	session.close()
 	return new_dataset_id
-	
+
+def set_success(dataset_id):
+    session = _get_default_db_session()
+    dataset = None
+    for d in session.query(Dataset).filter(Dataset.id==dataset_id):
+        dataset = d
+        break
+    if not dataset:
+        raise Exception("Could not find dataset with id {0}".format(dataset_id))
+    dataset.upload_success = True
+    session.commit()
+    session.close()
+
+def set_failed(dataset_id):
+    session = _get_default_db_session()
+    dataset = None
+    for d in session.query(Dataset).filter(Dataset.id==dataset_id):
+        dataset = d
+        break
+    if not dataset:
+        raise Exception("Could not find dataset with id {0}".format(dataset_id))
+    dataset.upload_failed = True
+    session.commit()
+    session.close()
+
+def get_last_dataset_status():
+    session = _get_default_db_session()
+    succ = False
+    fail = False
+    for d in session.query(Dataset).order_by(Dataset.id.desc()):
+        succ = d.upload_success
+        fail = d.upload_failed
+        break
+    session.commit()
+    session.close()
+    return succ, fail
+
 def update_agencies(new_agencies, new_dataset_id, lat, lng):
 	session = _get_default_db_session()
 	old_ids = []
@@ -135,7 +184,6 @@ def delete_dataset(id):
 	
 	session.commit()
 	session.close()
-	pass
 
 def get_random_mean_lat_lng(dbname):
     engine = create_engine(_get_complete_database_name(dbname))
@@ -217,6 +265,40 @@ def get_urban_by_id(agency_id, route_id):
         urban_result.append(urb)
     session.close()
     return urban_result[0].category
+	
+# Functions for population table	
+def fill_population_table(agency_id, stop_id, population):
+    session = _get_default_db_session()
+    _insert_population(agency_id, stop_id, population)
+    session.close()
+	
+def get_population(agency_id):
+    session = _get_default_db_session()
+
+    population_result = {}
+    for pop in session.query(Population).filter(Population.agency_id==agency_id):
+        population_result['stop_id'] = pop.population
+    session.close()
+    return population_result
+	
+def get_population_by_id(agency_id, stop_id):
+    session = _get_default_db_session()
+
+    population_result = []
+    for pop in session.query(Population).filter(Population.agency_id==agency.id, Population.stop_id==stop_id):
+        population_result.append(pop)
+    session.close()
+    return population_result[0].population
+	
+	
+    lat = 0
+    lng = 0
+    for r in session.query(Agency).filter(Agency.id==agency_id):
+        lat = r.latitude
+        lng = r.longitude
+        break
+    session.close()
+    return {'lat': lat, 'lng': lng}
 
 ''' "private" functions '''
 
@@ -275,6 +357,13 @@ def _insert_urban(session, route_id, is_urban):
     u = Urban(route=route_id, category=is_urban)
     session.add(u)
     session.commit()
+	
+def _insert_population(agency_id,stop_id, population):
+    p = Population(agency_id=agency_id, stop_id=stop_id, population=population)
+    session.add(p)
+    session.commit()
+	
+	
 
 def _database_op(dbname, create=True, drop=False):
     if config.DATABASE == config.POSTGRE:

@@ -2,10 +2,6 @@
 
 from services.insee import get_population
 
-def get_route_details(agency_id,route_id):
-	population = _get_population_insee(5.35,43.24,3000)
-	print(population)
-
 def get_population_insee(lon, lat, dist):
 	distDegree = dist * 0.0001 / 7.89 #Conversion des mètres en degrés
 	left = lon - distDegree

@@ -3,6 +3,7 @@
 from datetime import datetime
 import os
 from database import database_access as db
+from utils.logger import log_trace, log_error
 
 TMPDIR = 'tmp/'
 
@@ -25,23 +26,37 @@ def add_gtfs_to_db(file):
 	
 	errormsg = None
 	try:
-		dao.load_gtfs(file)
+		log_trace("Creating dataset...")
 		dataset_id = db.create_dataset(dbname)
+		log_trace("Loading GTFS...")
+		dao.load_gtfs(file)
 		new_agencies = dao.agencies()
+		log_trace("Calculating lat/lng of agencies...")
 		lat, lng = db.get_random_mean_lat_lng(dbname)
+		log_trace("Updating agencies...")
 		old_dataset_ids = db.update_agencies(new_agencies, dataset_id, lat, lng)
 		for old_id in old_dataset_ids:
+			log_trace("Deleting old dataset...")
 			db.delete_dataset(old_id)
-			
+		log_trace("Setting success...")
+		db.set_success(dataset_id)
+		log_trace("Done")
 	except Exception as e:
+		log_error(e)
+		db.set_failed(dataset_id)
 		db.drop_database(dbname)
 		# TODO delete all created stuff and put db in old state
 		raise Exception("Error loading gtfs zip file: {0}".format(str(e)))
+
 	return dbname
 
 def calculate_urban(dbname):
     db.create_and_fill_urban_table(dbname)
 
+def status_of_last_upload():
+    succ, fail = db.get_last_dataset_status()
+    return {"success": succ, 
+            "failed": fail }
 
 def _filename_to_dbname(filename):
 	filename = os.path.basename(filename)

@@ -2,6 +2,8 @@
 
 from gtfslib.model import Route, StopTime, Shape
 from database.database_access import get_dao, get_urban_by_id
+from services.display_population_insee import get_population_insee
+populationTotale = 0
 
 def get_route(agency_id, route_id):
 	dao = get_dao(agency_id)
@@ -21,7 +23,41 @@ def get_route(agency_id, route_id):
 	parsedRoute['points'] = listPoints
 			
 	return parsedRoute
+	
+def get_population(agency_id, route_id):
+	dao = get_dao(agency_id)
+	parsedRoute = dict()
+	listPoints = list()
 
+	route = dao.route(route_id)
+	parsedRoute["id"] = route.route_id
+	parsedRoute["short_name"] = route.route_short_name
+	parsedRoute["name"] = route.route_long_name
+	parsedRoute["category"] = get_urban_by_id(agency_id, route_id)
+
+	# All trips have same trip_id so we may use only the first : route.trips[0]
+	if len(route.trips) is not 0:
+		_get_route_shapepoints(dao, route.trips[0].shape_id, listPoints)
+		_get_route_stops(dao, route.trips[0].trip_id, listPoints, True)
+	parsedRoute['points'] = listPoints
+	parsedRoute['population_totale'] = populationTotale
+			
+	return parsedRoute
+	
+def get_population_stops(agency_id,route_id):
+	dao = get_dao(agency_id)
+	parsedRoute = dict()
+	listPoints = list()
+
+	route = dao.route(route_id)
+
+	# All trips have same trip_id so we may use only the first : route.trips[0]
+	if len(route.trips) is not 0:
+		_get_route_stops(dao, route.trips[0].trip_id, listPoints, True)
+	parsedRoute['points'] = listPoints
+	parsedRoute['population_totale'] = populationTotale
+			
+	return parsedRoute
 
 '''	Private methods '''
 
@@ -43,7 +79,8 @@ def _get_route_shapepoints(dao, shapeId, listPoints):
 	print('Nb shape points = '+str(countPoints))
 	return
 
-def _get_route_stops(dao, tripId, listPoints):
+def _get_route_stops(dao, tripId, listPoints, avecPopulation = False):
+	global populationTotale
 	countStops = 0
 
 	stoptimes = dao.stoptimes(fltr=StopTime.trip_id == tripId)
@@ -58,6 +95,9 @@ def _get_route_stops(dao, tripId, listPoints):
 			parsedStop['name'] = stop.stop_name
 			parsedStop['is_stop'] = True
 			parsedStop['location'] = {'lat': stop.stop_lat, 'lng': stop.stop_lon}
+			if avecPopulation :
+				parsedStop['population'] = get_population_insee(stop.stop_lon,stop.stop_lat,200)
+				populationTotale = populationTotale + parsedStop['population']
 			if not _check_already_in(listPoints, parsedStop):
 				listPoints.append(parsedStop)
 
