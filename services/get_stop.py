@@ -17,7 +17,7 @@ def get_stop(agency_id, stop_id):
 		parsedStop['location'] = {'lat': stop.stop_lat or '', 'lng': stop.stop_lon or ''}
 
 
-	print(get_stop_routes(agency_id, stop_id))
+	routes = get_stop_routes(agency_id, stop_id)
 	return parsedStop
 
 

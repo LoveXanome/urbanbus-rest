@@ -10,5 +10,5 @@ POSTGRE_HOST = os.environ.get('POSTGRE_HOST') or 'localhost'
 
 SECRET_KEY = os.environ.get('SECRET_KEY') or 'coucou-hibou'
 
-LOG_PERF = False
-PRINT_PERF = False
+LOG_PERF = True
+PRINT_PERF = True

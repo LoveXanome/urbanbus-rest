@@ -303,8 +303,11 @@ def get_stop_routes(agency_id, stop_id):
     engine = create_engine(complete_db_name)
 
     with engine.connect() as con:
-        sql_result = con.execute("SELECT * FROM stop_times \
+        sql_result = con.execute("SELECT DISTINCT routes.route_id, routes.route_long_name \
+                                  FROM stop_times, trips, routes \
                                   WHERE stop_id="+str(stop_id)+" \
+                                        AND stop_times.trip_id=trips.trip_id \
+                                        AND trips.route_id=routes.route_id \
                                   LIMIT 10")
         results = []
 
