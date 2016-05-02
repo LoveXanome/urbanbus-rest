@@ -20,7 +20,7 @@ def get_routes(agency_id, limit=None):
 		parsedRoute["name"] = route.route_long_name
 		parsedRoute["category"] = urban_routes[route.route_id]["category"]
 		parsedRoute["interdistance"] = urban_routes[route.route_id]["interdistance"]
-		parsedRoute["ratio"] = urban_routes[route.route_id]["ratio"]
+		parsedRoute["ratio"] = urban_routes[route.route_id]["ratio"] if(urban_routes[route.route_id]["ratio"] != float("inf")) else None
 		parsedRoutes.append(parsedRoute)
 
 	return sorted(parsedRoutes, key=lambda k: k['name'])

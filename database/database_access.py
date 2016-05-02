@@ -271,7 +271,7 @@ def get_urban_by_id(agency_id, route_id):
                         "ratio": urb.ratio }
         break
     session.close()
-    return urban_result[0].category
+    return urban_result
 	
 # Functions for population table	
 def fill_population_table(agency_id, stop_id, population):
