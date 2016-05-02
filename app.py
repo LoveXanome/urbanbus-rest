@@ -59,6 +59,7 @@ def upload_file_thread(filename):
 def upload_status():
     return jsonify({"status": upload_gtfs.status_of_last_upload()}), 200
 
+
 ''' GET endpoints '''
 
 @app.route("/agencies", methods=['GET'])
