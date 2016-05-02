@@ -32,4 +32,4 @@ def log_error(ex):
 
 def log_trace(msg):
 	with open('trace.log', 'a') as f:
-		f.write("{0}: {1}".format(get_date(), msg))
+		f.write("{0}: {1}\n".format(get_date(), msg))

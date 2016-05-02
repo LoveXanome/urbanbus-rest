@@ -48,6 +48,8 @@ class Urban(GtfsBase):
 
     id = Column(Integer, primary_key=True, nullable=False)
     category = Column(Boolean, nullable=True)
+    interdistance = Column(Float, nullable=True)
+    ratio = Column(Float, nullable=True)
     route = Column(String, nullable=False, unique=True) # TODO ForeignKey on mapper in gtfslib.orm
 
     def __repr__(self):
@@ -236,8 +238,8 @@ def create_and_fill_urban_table(dbname):
 
     dbdao = dao.Dao(full_dbname)
     for route in dbdao.routes(prefetch_trips=True):
-        urban = _is_urban(route)
-        _insert_urban(session, route.route_id, urban)
+        urban, distance, ratio = _is_urban(route)
+        _insert_urban(session, route.route_id, urban, distance, ratio)
     session.close()
 
 def get_urban(agency_id):
@@ -249,7 +251,9 @@ def get_urban(agency_id):
 
     urban_result = {}
     for urb in session.query(Urban).all():
-        urban_result[urb.route] = urb.category
+        urban_result[urb.route] = { "category": urb.category,
+                                    "interdistance": urb.interdistance,
+                                    "ratio": urb.ratio }
     session.close()
     return urban_result
 
@@ -260,9 +264,12 @@ def get_urban_by_id(agency_id, route_id):
     sessionmk = sessionmaker(bind=engine)
     session = sessionmk()
 
-    urban_result = []
+    urban_result = {}
     for urb in session.query(Urban).filter(Urban.route==route_id):
-        urban_result.append(urb)
+        urban_result = {"category": urb.category,
+                        "interdistance": urb.interdistance,
+                        "ratio": urb.ratio }
+        break
     session.close()
     return urban_result[0].category
 	
@@ -289,16 +296,6 @@ def get_population_by_id(agency_id, stop_id):
         population_result.append(pop)
     session.close()
     return population_result[0].population
-	
-	
-    lat = 0
-    lng = 0
-    for r in session.query(Agency).filter(Agency.id==agency_id):
-        lat = r.latitude
-        lng = r.longitude
-        break
-    session.close()
-    return {'lat': lat, 'lng': lng}
 
 ''' "private" functions '''
 
@@ -345,7 +342,10 @@ def _agency_exist(session, id, name):
 
 
 def _is_urban(route):
-    return decret_2015_1610(route.trips, False)
+    urb, dis, rat = decret_2015_1610(route.trips, False)
+    dis = dis if dis else -1
+    rat = rat if rat else -1
+    return urb, dis, rat
 
 def _create_urban_table(full_dbname):
     engine = create_engine(full_dbname)
@@ -353,8 +353,8 @@ def _create_urban_table(full_dbname):
     return engine
 
 
-def _insert_urban(session, route_id, is_urban):
-    u = Urban(route=route_id, category=is_urban)
+def _insert_urban(session, route_id, is_urban, distance, ratio):
+    u = Urban(route=route_id, category=is_urban, interdistance=distance, ratio=ratio)
     session.add(u)
     session.commit()
 	
