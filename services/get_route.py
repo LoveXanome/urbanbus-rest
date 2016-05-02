@@ -19,15 +19,13 @@ def get_route(agency_id, route_id):
 	parsedRoute["category"] = urban["category"]
 	parsedRoute["interdistance"] = urban["interdistance"]
 	parsedRoute["ratio"] = urban["ratio"] if(urban["ratio"] != float("inf")) else None
-	print(urban['ratio'] != float("inf"))
-	print(urban['ratio'])
-	print(float("inf"))
+
 	# All trips have same trip_id so we may use only the first : route.trips[0]
 	if len(route.trips) is not 0:
 		_get_route_shapepoints(dao, route.trips[0].shape_id, listPoints)
 		parsedRoute['points'] = listPoints
 		_get_route_stops(dao, route.trips[0].trip_id, listStops)
-		parsedRoute['stop_points'] = listStops
+		parsedRoute['stops'] = listStops
 			
 	return parsedRoute
 	
