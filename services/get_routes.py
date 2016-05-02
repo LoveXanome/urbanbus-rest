@@ -23,5 +23,4 @@ def get_routes(agency_id, limit=None):
 		parsedRoute["ratio"] = urban_routes[route.route_id]["ratio"]
 		parsedRoutes.append(parsedRoute)
 
-	return parsedRoutes
-
+	return sorted(parsedRoutes, key=lambda k: k['name'])
