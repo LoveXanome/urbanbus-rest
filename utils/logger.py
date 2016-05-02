@@ -29,3 +29,7 @@ def log_performance(start, end, params, filePath):
 def log_error(ex):
 	with open('error.log', 'a') as f:
 		traceback.print_exc(file=f)
+
+def log_trace(msg):
+	with open('trace.log', 'a') as f:
+		f.write("{0}: {1}".format(get_date(), msg))
