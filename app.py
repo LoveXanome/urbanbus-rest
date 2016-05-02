@@ -18,6 +18,7 @@ from services.get_route import get_route
 from services.get_stop import get_stop
 from services.get_route import get_population
 from services.get_passages import get_nb_passages
+from services.get_avg_speed import get_avg_speed
 from utils.logger import log_error
 from threading import Thread
 
@@ -93,6 +94,11 @@ def display_stop(agency_id, stop_id):
 def display_passages(agency_id, stop_id, route_id):
     params = { 'agency_id': agency_id, 'route_id': route_id, 'stop_id': stop_id }
     return call_service(get_nb_passages, "passages", **params)
+	
+@app.route("/agencies/<int:agency_id>/routes/<route_id>/stops/<stop_id>/vitesse", methods=['GET'])
+def display_vitesse(agency_id, stop_id, route_id):
+    params = { 'agency_id': agency_id, 'route_id': route_id, 'stop_id': stop_id }
+    return call_service(get_avg_speed, "passages", **params)
 
 
 if __name__ == "__main__":
