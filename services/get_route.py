@@ -9,6 +9,7 @@ def get_route(agency_id, route_id):
 	dao = get_dao(agency_id)
 	parsedRoute = dict()
 	listPoints = list()
+	listStops = list()
 
 	route = dao.route(route_id)
 	parsedRoute["id"] = route.route_id
@@ -22,8 +23,9 @@ def get_route(agency_id, route_id):
 	# All trips have same trip_id so we may use only the first : route.trips[0]
 	if len(route.trips) is not 0:
 		_get_route_shapepoints(dao, route.trips[0].shape_id, listPoints)
-		_get_route_stops(dao, route.trips[0].trip_id, listPoints)
-	parsedRoute['points'] = listPoints
+		parsedRoute['shape_points'] = listPoints
+		_get_route_stops(dao, route.trips[0].trip_id, listStops)
+		parsedRoute['stop_points'] = listStops
 			
 	return parsedRoute
 	
