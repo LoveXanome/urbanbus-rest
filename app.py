@@ -15,8 +15,11 @@ from services.get_agencies import get_agencies
 from services.get_agency import get_agency
 from services.get_routes import get_routes
 from services.get_route import get_route
+from services.get_stop import get_stop
 from services.get_route import get_population
 from services.calculer_population import calculer_pop
+
+
 from utils.logger import log_error
 from threading import Thread
 
@@ -80,14 +83,23 @@ def display_route(agency_id, route_id):
     params = { 'agency_id': agency_id, 'route_id': route_id }
     return call_service(get_route, "route", **params)
 	
+
 @app.route("/agencies/<int:agency_id>/routes/<route_id>/population", methods=['GET'])
 def display_population_route(agency_id, route_id):
 	params = { 'agency_id': agency_id, 'route_id': route_id }
 	return call_service(get_population, "population", **params)
-	
+
+
 @app.route("/caclul_population", methods=['GET'])
 def display_caclul_population():
 	return call_service(calculer_pop, "termine_correctement")
+
+
+@app.route("/agencies/<int:agency_id>/stops/<stop_id>", methods=['GET'])
+def display_stop(agency_id, stop_id):
+    params = { 'agency_id': agency_id, 'stop_id': stop_id }
+    return call_service(get_stop, "stop", **params)
+
 
 if __name__ == "__main__":
     init_db()

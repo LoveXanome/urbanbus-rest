@@ -297,6 +297,23 @@ def get_population_by_id(agency_id, stop_id):
     session.close()
     return population_result[0].population
 
+def get_stop_routes(agency_id, stop_id):
+    database_name = _retrieve_database(agency_id)
+    complete_db_name = _get_complete_database_name(database_name)
+    engine = create_engine(complete_db_name)
+
+    with engine.connect() as con:
+        sql_result = con.execute("SELECT * FROM stop_times \
+                                  WHERE stop_id="+str(stop_id)+" \
+                                  LIMIT 10")
+        results = []
+
+        for r in sql_result:
+            print(r)
+            results.append(r)
+
+    return results
+
 ''' "private" functions '''
 
 def _get_default_db_session():
