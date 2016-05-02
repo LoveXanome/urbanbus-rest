@@ -194,9 +194,13 @@ def get_passages(agency_id, stop_id, route_id):
 	complete_db_name = _get_complete_database_name(database_name)
 	engine = create_engine(complete_db_name)
 	with engine.connect() as con:
-		sql_result = con.execute("SELECT COUNT (*) FROM trips, stop_times where stop_times.stop_id = "+ stop_id +" AND stop_times.trip_id = trips.trip_id AND trips.route_id = " + route_id)
+		sql_result = con.execute("SELECT trips.service_id,count(*) as passages FROM trips, stop_times where stop_times.stop_id = "+ stop_id +" AND stop_times.trip_id = trips.trip_id AND trips.route_id = " + route_id + " GROUP BY trips.service_id ORDER BY passages desc")
+		results = []
 		for r in sql_result:
-			return r[0]
+			results.append(r)
+		rMax = (results[0])[1]/5
+		rMin = (results[len(results)-1])[1]
+	return {'passagesSemaine' : rMax, 'passagesWE' : rMin}
 
 def get_random_mean_lat_lng(dbname):
     engine = create_engine(_get_complete_database_name(dbname))
