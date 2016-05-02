@@ -12,7 +12,10 @@ def get_route(agency_id, route_id):
 	parsedRoute["id"] = route.route_id
 	parsedRoute["short_name"] = route.route_short_name
 	parsedRoute["name"] = route.route_long_name
-	parsedRoute["category"] = get_urban_by_id(agency_id, route_id)
+	urban = get_urban_by_id(agency_id, route_id)
+	parsedRoute["category"] = urban["category"]
+	parsedRoute["interdistance"] = urban["interdistance"]
+	parsedRoute["ratio"] = urban["ratio"]
 
 	# All trips have same trip_id so we may use only the first : route.trips[0]
 	if len(route.trips) is not 0:

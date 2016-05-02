@@ -45,7 +45,7 @@ def upload_file():
 def upload_file_thread(filename):
     try:
         database_name = upload_gtfs.add_gtfs_to_db(filename)
-        upload_gtfs.calculate_urban(database_name)
+        # Urban calcul made in function above
     except Exception as e:
         log_error(e)
         return error(str(e))

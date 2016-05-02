@@ -38,6 +38,7 @@ def add_gtfs_to_db(file):
 		for old_id in old_dataset_ids:
 			log_trace("Deleting old dataset...")
 			db.delete_dataset(old_id)
+		calculate_urban(dbname)
 		log_trace("Setting success...")
 		db.set_success(dataset_id)
 		log_trace("Done")
@@ -51,7 +52,9 @@ def add_gtfs_to_db(file):
 	return dbname
 
 def calculate_urban(dbname):
+    log_trace("Creating and filling urban table...")
     db.create_and_fill_urban_table(dbname)
+    log_trace("Done calculating urban")
 
 def status_of_last_upload():
     succ, fail = db.get_last_dataset_status()
