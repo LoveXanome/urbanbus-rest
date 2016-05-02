@@ -272,13 +272,13 @@ def get_urban_by_id(agency_id, route_id):
         break
     session.close()
     return urban_result
-	
-# Functions for population table	
+
+# Functions for population table
 def fill_population_table(agency_id, stop_id, population):
     session = _get_default_db_session()
     _insert_population(session, agency_id, stop_id, population)
     session.close()
-	
+
 def get_population(agency_id):
     session = _get_default_db_session()
 
@@ -287,7 +287,7 @@ def get_population(agency_id):
         population_result['stop_id'] = pop.population
     session.close()
     return population_result
-	
+
 def get_population_by_id(agency_id, stop_id):
     session = _get_default_db_session()
 
@@ -377,13 +377,12 @@ def _insert_urban(session, route_id, is_urban, distance, ratio):
     u = Urban(route=route_id, category=is_urban, interdistance=distance, ratio=ratio)
     session.add(u)
     session.commit()
-	
+
 def _insert_population(session, agency_id,stop_id, population):
     p = Population(agency_id=agency_id, stop_id=stop_id, population=population)
     session.add(p)
     session.commit()
-	
-	
+
 
 def _database_op(dbname, create=True, drop=False):
     if config.DATABASE == config.POSTGRE:
