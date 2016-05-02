@@ -188,6 +188,15 @@ def delete_dataset(id):
 	
 	session.commit()
 	session.close()
+	
+def get_passages(agency_id, stop_id, route_id):
+	database_name = _retrieve_database(agency_id)
+	complete_db_name = _get_complete_database_name(database_name)
+	engine = create_engine(complete_db_name)
+	with engine.connect() as con:
+		sql_result = con.execute("SELECT COUNT (*) FROM trips, stop_times where stop_times.stop_id = "+ stop_id +" AND stop_times.trip_id = trips.trip_id AND trips.route_id = " + route_id)
+		for r in sql_result:
+			return r[0]
 
 def get_random_mean_lat_lng(dbname):
     engine = create_engine(_get_complete_database_name(dbname))
