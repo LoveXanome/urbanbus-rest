@@ -4,7 +4,7 @@ import json
 import csv
 import subprocess
 from os import path, rename, makedirs
-from urllib.request import urlopen
+import requests
 import zipfile
 from threading import Thread
 from utils.logger import log_trace
@@ -49,9 +49,9 @@ def _get_file(zipname, filename):
     dest_zip = path.join(TMP_DIR, zipname)
     # Download
     log_trace("Downloading {0}".format(dest_zip))
-    file = urlopen("http://www.insee.fr/fr/ppp/bases-de-donnees/donnees-detaillees/donnees-carroyees/zip/{0}".format(zipname))
+    file = requests.get("http://www.insee.fr/fr/ppp/bases-de-donnees/donnees-detaillees/donnees-carroyees/zip/{0}".format(zipname))
     with open(dest_zip, 'wb') as f:
-        f.write(file.read())
+        f.write(file.content)
     # Unzip
     log_trace("Unziping {0}".format(dest_zip))
     with zipfile.ZipFile(dest_zip, 'r') as zip_ref:

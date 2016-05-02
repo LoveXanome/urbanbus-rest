@@ -23,11 +23,11 @@ class Dataset(Base):
 	id = Column(Integer, primary_key=True, nullable=False)
 	database_name = Column(String, nullable=False)
 	add_date = Column(DateTime, default=func.now(), nullable=False)
-	upload_success = Column(Boolean, nullable=False, default=False)
+	upload_done = Column(Boolean, nullable=False, default=False)
 	upload_failed = Column(Boolean, nullable=False, default=False)
 	
 	def __repr__(self):
-		return "<Dataset(id='{0}', database_name='{1}', add_date='{2}', upload_success='{3}', upload_failed='{4}')>".format(self.id, self.database_name, self.add_date, self.upload_success, self.upload_failed)
+		return "<Dataset(id='{0}', database_name='{1}', add_date='{2}', upload_done='{3}', upload_failed='{4}')>".format(self.id, self.database_name, self.add_date, self.upload_done, self.upload_failed)
 	
 class Agency(Base):
 	__tablename__ = 'agency'
@@ -121,7 +121,7 @@ def create_dataset(dbname):
 	session.close()
 	return new_dataset_id
 
-def set_success(dataset_id):
+def set_done(dataset_id):
     session = _get_default_db_session()
     dataset = None
     for d in session.query(Dataset).filter(Dataset.id==dataset_id):
@@ -129,7 +129,7 @@ def set_success(dataset_id):
         break
     if not dataset:
         raise Exception("Could not find dataset with id {0}".format(dataset_id))
-    dataset.upload_success = True
+    dataset.upload_done = True
     session.commit()
     session.close()
 
@@ -147,15 +147,15 @@ def set_failed(dataset_id):
 
 def get_last_dataset_status():
     session = _get_default_db_session()
-    succ = False
+    done = False
     fail = False
     for d in session.query(Dataset).order_by(Dataset.id.desc()):
-        succ = d.upload_success
+        done = d.upload_done
         fail = d.upload_failed
         break
     session.commit()
     session.close()
-    return succ, fail
+    return done, fail
 
 def update_agencies(new_agencies, new_dataset_id, lat, lng):
 	session = _get_default_db_session()

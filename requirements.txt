@@ -4,5 +4,5 @@ flask-cors
 pyqtree
 gunicorn
 psycopg2
-urllib
+requests
 zipfile

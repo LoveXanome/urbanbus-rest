@@ -44,7 +44,7 @@ def add_gtfs_to_db(file):
 		calculate_population(dbname, dataset_id)
 
 		log_trace("Setting success...")
-		db.set_success(dataset_id)
+		db.set_done(dataset_id)
 		log_trace("Done")
 	except Exception as e:
 		log_error(e)
@@ -61,8 +61,8 @@ def calculate_urban(dbname):
     log_trace("Done calculating urban")
 
 def status_of_last_upload():
-    succ, fail = db.get_last_dataset_status()
-    return {"success": succ, 
+    done, fail = db.get_last_dataset_status()
+    return {"done": done, 
             "failed": fail }
 
 def _filename_to_dbname(filename):
