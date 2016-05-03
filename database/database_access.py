@@ -209,20 +209,30 @@ def get_average_speed(agency_id, stop_id, route_id):
 	complete_db_name = _get_complete_database_name(database_name)
 	engine = create_engine(complete_db_name)
 	with engine.connect() as con:
-		sql_result = con.execute("SELECT  stop_times.stop_sequence, stop_times.stop_id, stop_times.departure_time, stop_times.arrival_time, stop_times.shape_dist_traveled FROM stop_times,trips where stop_times.trip_id = trips.trip_id and trips.route_id = '" + route_id +"' GROUP BY stop_times.stop_sequence")
+		sql_result = con.execute("SELECT  stop_times.stop_sequence, stop_times.stop_id, stop_times.departure_time, stop_times.arrival_time, stop_times.shape_dist_traveled, count(stop_times.stop_id) as total FROM stop_times,trips where stop_times.trip_id = trips.trip_id and trips.route_id = '"+ route_id +"' GROUP BY stop_times.stop_id ORDER BY stop_times.stop_sequence asc")
+		total = 0
+		totalStop = 0
+		for r in sql_result:
+			total = r[5]
+			break
+		for r in sql_result:
+			if str(r[1]) == stop_id:
+				totalStop = r[5]
+		sql_resultat = con.execute("SELECT  stop_times.stop_sequence, stop_times.stop_id, stop_times.departure_time, stop_times.arrival_time, stop_times.shape_dist_traveled, count(stop_times.stop_id) as total FROM stop_times,trips where stop_times.trip_id = trips.trip_id and trips.route_id = '"+ route_id +"' GROUP BY stop_times.stop_id ORDER BY stop_times.stop_sequence asc")
 		results = []
 		indiceStop = -1
 		indiceTerminus = 0
 		terminusTrouve = False
-		for r in sql_result:
-			results.append(r)
-			if not terminusTrouve:
-				if r[1] == stop_id:
-					indiceStop = r[0]
-				if not r[2]:
-					indiceTerminus = r[0]
-					terminusTrouve = True
-		print(indiceStop)
+		for r in sql_resultat:
+			if (r[5] == total) or (r[5] == totalStop):
+				results.append(r)
+				if not terminusTrouve:
+					if str(r[1]) == stop_id:
+						indiceStop = r[0]
+					if not r[2]:
+						indiceTerminus = r[0]
+						terminusTrouve = True
+		#print(len(results))
 		if indiceStop < 0:
 			vitesse = get_average_speed_route(agency_id, route_id)
 			return vitesse
@@ -243,7 +253,7 @@ def get_average_speed(agency_id, stop_id, route_id):
 		temps = ((results[indiceStop+indicePlus])[3]-(results[indiceStop-indiceMoins])[2])
 		distance = ((results[indiceStop+indicePlus])[4]-(results[indiceStop-indiceMoins])[4])
 		vitesse = (distance/temps)*3.6
-	return vitesse
+	return abs(vitesse)
 	
 def get_average_speed_route(agency_id, route_id):
 	database_name = _retrieve_database(agency_id)
@@ -263,7 +273,7 @@ def get_average_speed_route(agency_id, route_id):
 		temps = ((results[indiceTerminus])[3]-(results[0])[2])
 		distance = (results[indiceTerminus])[4]
 		vitesse = (distance/temps)*3.6
-	return vitesse
+	return abs(vitesse)
 
 def get_random_mean_lat_lng(dbname):
     engine = create_engine(_get_complete_database_name(dbname))
