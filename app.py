@@ -16,10 +16,6 @@ from services.get_agency import get_agency
 from services.get_routes import get_routes
 from services.get_route import get_route
 from services.get_stop import get_stop
-from services.get_route import get_population
-from services.get_passages import get_nb_passages
-from services.get_avg_speed import get_avg_speed
-from services.get_avg_speed import get_avg_speed_route
 from utils.logger import log_error
 from threading import Thread
 
@@ -81,30 +77,12 @@ def display_route(agency_id, route_id):
     params = { 'agency_id': agency_id, 'route_id': route_id }
     return call_service(get_route, "route", **params)
 
-@app.route("/agencies/<int:agency_id>/routes/<route_id>/population", methods=['GET'])
-def display_population_route(agency_id, route_id):
-	params = { 'agency_id': agency_id, 'route_id': route_id }
-	return call_service(get_population, "population", **params)
 
 @app.route("/agencies/<int:agency_id>/stops/<stop_id>", methods=['GET'])
 def display_stop(agency_id, stop_id):
     params = { 'agency_id': agency_id, 'stop_id': stop_id }
     return call_service(get_stop, "stop", **params)
 	
-@app.route("/agencies/<int:agency_id>/routes/<route_id>/stops/<stop_id>/passages", methods=['GET'])
-def display_passages(agency_id, stop_id, route_id):
-    params = { 'agency_id': agency_id, 'route_id': route_id, 'stop_id': stop_id }
-    return call_service(get_nb_passages, "passages", **params)
-	
-@app.route("/agencies/<int:agency_id>/routes/<route_id>/stops/<stop_id>/vitesse", methods=['GET'])
-def display_vitesse(agency_id, stop_id, route_id):
-    params = { 'agency_id': agency_id, 'route_id': route_id, 'stop_id': stop_id }
-    return call_service(get_avg_speed, "vitesse_moyenne", **params)
-	
-@app.route("/agencies/<int:agency_id>/routes/<route_id>/vitesse", methods=['GET'])
-def display_vitesse_route(agency_id, route_id):
-    params = { 'agency_id': agency_id, 'route_id': route_id}
-    return call_service(get_avg_speed_route, "vitesse_moyenne", **params)
 
 if __name__ == "__main__":
     init_db()

@@ -202,7 +202,7 @@ def get_passages(agency_id, stop_id, route_id):
 			results.append(r)
 		rMax = (results[0])[1]/5
 		rMin = (results[len(results)-1])[1]
-	return {'passagesSemaine' : rMax, 'passagesWE' : rMin}
+	return {'passagesWeek' : rMax, 'passagesWE' : rMin}
 	
 def get_average_speed(agency_id, stop_id, route_id):
 	database_name = _retrieve_database(agency_id)
@@ -356,14 +356,14 @@ def fill_population_table(dataset, stop_id, population):
     session.close()
 
 def get_population(agency_id, stop_id):
-	database_name = 'general'
+	database_name = _get_default_database_name()
 	engine = create_engine(database_name)
 	with engine.connect() as con:
-		sql_result = con.execute("SELECT population FROM agency, population where agency.dataset=population.dataset and population.stop_id= " + stop_id + " and agency.id = " + agency_id)
+		sql_result = con.execute("SELECT population FROM agency, population where agency.dataset=population.dataset and population.stop_id= " + str(stop_id) + " and agency.id = " + str(agency_id))
 		results = []
 		for r in sql_result:
 			results.append(r)
-	return {'stop_population_200m' : (results[0])[0]}
+	return results[0][0]
 
 def get_stop_routes(agency_id, stop_id):
     database_name = _retrieve_database(agency_id)
