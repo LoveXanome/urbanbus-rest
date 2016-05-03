@@ -81,25 +81,17 @@ def display_route(agency_id, route_id):
     params = { 'agency_id': agency_id, 'route_id': route_id }
     return call_service(get_route, "route", **params)
 
+
 @app.route("/agencies/<int:agency_id>/routes/<route_id>/population", methods=['GET'])
 def display_population_route(agency_id, route_id):
 	params = { 'agency_id': agency_id, 'route_id': route_id }
 	return call_service(get_population, "population", **params)
 
+
 @app.route("/agencies/<int:agency_id>/stops/<stop_id>", methods=['GET'])
 def display_stop(agency_id, stop_id):
     params = { 'agency_id': agency_id, 'stop_id': stop_id }
     return call_service(get_stop, "stop", **params)
-	
-@app.route("/agencies/<int:agency_id>/routes/<route_id>/stops/<stop_id>/passages", methods=['GET'])
-def display_passages(agency_id, stop_id, route_id):
-    params = { 'agency_id': agency_id, 'route_id': route_id, 'stop_id': stop_id }
-    return call_service(get_nb_passages, "passages", **params)
-	
-@app.route("/agencies/<int:agency_id>/routes/<route_id>/stops/<stop_id>/vitesse", methods=['GET'])
-def display_vitesse(agency_id, stop_id, route_id):
-    params = { 'agency_id': agency_id, 'route_id': route_id, 'stop_id': stop_id }
-    return call_service(get_avg_speed, "vitesse_moyenne", **params)
 	
 
 if __name__ == "__main__":

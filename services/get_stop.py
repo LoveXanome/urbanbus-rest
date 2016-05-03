@@ -2,6 +2,8 @@
 
 from gtfslib.model import Route, StopTime, Shape
 from database.database_access import get_dao, get_urban_by_id, get_stop_routes
+from .get_avg_speed import get_avg_speed
+from .get_passages import get_passages
 
 def get_stop(agency_id, stop_id):
 	dao = get_dao(agency_id)
@@ -29,6 +31,8 @@ def _get_routes(agency_id, stop_id):
 		parsedRoute['id'] = route.route_id
 		parsedRoute['name'] = route.route_long_name
 		parsedRoute['short_name'] = route.route_short_name
+		parsedRoute['average_speed'] = get_avg_speed(agency_id, route.route_id, stop_id)
+		parsedRoute['passages'] = get_passages(agency_id, stop_id, route.route_id)
 		listRoutes.append(parsedRoute)
 
 	return listRoutes

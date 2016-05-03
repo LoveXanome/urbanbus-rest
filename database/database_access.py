@@ -233,7 +233,7 @@ def get_average_speed(agency_id, stop_id, route_id):
 		temps = ((results[indiceStop+indicePlus])[2]-(results[indiceStop-indiceMoins])[2])
 		distance = ((results[indiceStop+indicePlus])[3]-(results[indiceStop-indiceMoins])[3])
 		vitesse = (distance/temps)*3.6
-	return {'vitesse_moyenne_troncon' : vitesse}
+	return vitesse
 	
 def get_average_speed_route(agency_id, route_id):
 	database_name = _retrieve_database(agency_id)
