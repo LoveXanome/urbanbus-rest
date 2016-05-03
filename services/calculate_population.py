@@ -10,9 +10,9 @@ def calculate_population(dbname, dataset_id):
         sql_result = con.execute("SELECT * FROM stops")
         # TODO count for progress
         for stop in sql_result:
-            print(stop, flush=True)
+            print(stop)
             pop = get_population_insee(stop.stop_lon, stop.stop_lat, 200)
-            print(pop, flush=True)
+            print(pop)
             db.fill_population_table(dataset_id, stop.stop_id, pop)
 
     
