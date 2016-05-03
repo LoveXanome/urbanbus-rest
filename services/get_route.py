@@ -2,7 +2,7 @@
 
 from gtfslib.model import Route, StopTime, Shape
 from database.database_access import get_dao, get_urban_by_id
-from services.display_population_insee import get_population_insee
+from services.insee import get_population
 populationTotale = 0
 
 def get_route(agency_id, route_id):

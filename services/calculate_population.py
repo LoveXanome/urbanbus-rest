@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from database import database_access as db
-from services.display_population_insee import get_population_insee
+from services.insee import get_population
 
 def calculate_population(dbname, dataset_id):
     full_dbname = db._get_complete_database_name(dbname)
