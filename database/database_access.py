@@ -249,7 +249,7 @@ def get_average_speed_route(agency_id, route_id):
 		distance = ((results[len(results)-1])[3]-(results[1])[3])
 		vitesse = (distance/temps)*3.6
 	return {'vitesse_moyenne_ligne' : vitesse}
-	
+
 def get_random_mean_lat_lng(dbname):
     engine = create_engine(_get_complete_database_name(dbname))
     selected = []
@@ -342,24 +342,15 @@ def fill_population_table(dataset, stop_id, population):
     _insert_population(session, dataset, stop_id, population)
     session.close()
 
-def get_population(agency_id):
-    session = _get_default_db_session()
-
-    population_result = {}
-    for pop in session.query(Population).filter(Population.agency_id==agency_id):
-        population_result['stop_id'] = pop.population
-    session.close()
-    return population_result
-
-def get_population_by_id(agency_id, stop_id):
-    session = _get_default_db_session()
-
-    population_result = []
-    for pop in session.query(Population).filter(Population.agency_id==agency.id, Population.stop_id==stop_id):
-        population_result.append(pop)
-        break
-    session.close()
-    return population_result[0].population
+def get_population(agency_id, stop_id):
+	database_name = 'general'
+	engine = create_engine(database_name)
+	with engine.connect() as con:
+		sql_result = con.execute("SELECT population FROM agency, population where agency.dataset=population.dataset and population.stop_id= " + stop_id + " and agency.id = " + agency_id)
+		results = []
+		for r in sql_result:
+			results.append(r)
+	return {'stop_population_200m' : (results[0])[0]}
 
 def get_stop_routes(agency_id, stop_id):
     database_name = _retrieve_database(agency_id)
