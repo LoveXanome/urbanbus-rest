@@ -216,12 +216,14 @@ def get_average_speed(agency_id, stop_id, route_id):
 			results.append(r)
 			if r[1] == stop_id:
 				indiceStop = r[0]
-		if indiceStop > 1 :
+		if indiceStop > 2 :
 			indiceMoins = 2
-		elif indiceStop == 1:
+		elif indiceStop == 2:
 			indiceMoins = 1
-		else :
+		elif indiceStop == 1 :
 			indiceMoins = 0
+		else :
+			indiceMoins = -1
 		if indiceStop < len(results)-2:
 			indicePlus = 2
 		elif indiceStop == len(results)-1:
