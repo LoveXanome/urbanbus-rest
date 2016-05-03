@@ -209,13 +209,23 @@ def get_average_speed(agency_id, stop_id, route_id):
 	complete_db_name = _get_complete_database_name(database_name)
 	engine = create_engine(complete_db_name)
 	with engine.connect() as con:
-		sql_result = con.execute("SELECT  stop_times.stop_sequence, stop_times.stop_id,  stop_times.arrival_time, stop_times.shape_dist_traveled FROM stop_times,trips where stop_times.trip_id = trips.trip_id and trips.route_id = " + route_id +" GROUP BY stop_times.stop_sequence")
+		sql_result = con.execute("SELECT  stop_times.stop_sequence, stop_times.stop_id, stop_times.departure_time, stop_times.arrival_time, stop_times.shape_dist_traveled FROM stop_times,trips where stop_times.trip_id = trips.trip_id and trips.route_id = " + route_id +" GROUP BY stop_times.stop_sequence")
 		results = []
-		indiceStop = 0
+		indiceStop = -1
+		indiceTerminus = 0
+		terminusTrouve = False
 		for r in sql_result:
 			results.append(r)
-			if r[1] == stop_id:
-				indiceStop = r[0]
+			if not terminusTrouve:
+				if r[1] == stop_id:
+					indiceStop = r[0]
+				if not r[2]:
+					indiceTerminus = r[0]
+					terminusTrouve = True
+		print(indiceStop)
+		if indiceStop < 0:
+			vitesse = get_average_speed_route(agency_id, route_id)
+			return vitesse
 		if indiceStop > 2 :
 			indiceMoins = 2
 		elif indiceStop == 2:
@@ -224,31 +234,34 @@ def get_average_speed(agency_id, stop_id, route_id):
 			indiceMoins = 0
 		else :
 			indiceMoins = -1
-		if indiceStop < len(results)-2:
+		if indiceStop < indiceTerminus-1:
 			indicePlus = 2
-		elif indiceStop == len(results)-2:
+		elif indiceStop == indiceTerminus-1:
 			indicePlus = 1
 		else:
 			indicePlus = 0
 		temps = ((results[indiceStop+indicePlus])[2]-(results[indiceStop-indiceMoins])[2])
 		distance = ((results[indiceStop+indicePlus])[3]-(results[indiceStop-indiceMoins])[3])
 		vitesse = (distance/temps)*3.6
-	return {'vitesse_moyenne_troncon' : vitesse}
+	return vitesse
 	
 def get_average_speed_route(agency_id, route_id):
 	database_name = _retrieve_database(agency_id)
 	complete_db_name = _get_complete_database_name(database_name)
 	engine = create_engine(complete_db_name)
 	with engine.connect() as con:
-		sql_result = con.execute("SELECT  stop_times.stop_sequence, stop_times.stop_id,  stop_times.arrival_time, stop_times.shape_dist_traveled FROM stop_times,trips where stop_times.trip_id = trips.trip_id and trips.route_id = " + route_id +" GROUP BY stop_times.stop_sequence")
+		sql_result = con.execute("SELECT  stop_times.stop_sequence, stop_times.stop_id, stop_times.departure_time, stop_times.arrival_time, stop_times.shape_dist_traveled FROM stop_times,trips where stop_times.trip_id = trips.trip_id and trips.route_id = " + route_id +" GROUP BY stop_times.stop_sequence")
 		results = []
+		indiceTerminus = 0
 		for r in sql_result:
 			results.append(r)
-		#On commence à 1 car le premier temps peut être null
-		temps = ((results[len(results)-1])[2]-(results[1])[2])
-		distance = ((results[len(results)-1])[3]-(results[1])[3])
+			if not r[2]:
+				indiceTerminus = r[0]
+				break
+		temps = ((results[indiceTerminus])[3]-(results[0])[2])
+		distance = (results[indiceTerminus])[4]
 		vitesse = (distance/temps)*3.6
-	return {'vitesse_moyenne_ligne' : vitesse}
+	return vitesse
 
 def get_random_mean_lat_lng(dbname):
     engine = create_engine(_get_complete_database_name(dbname))
