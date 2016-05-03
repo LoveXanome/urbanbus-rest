@@ -3,6 +3,7 @@
 from gtfslib.model import Route, StopTime, Shape
 from database.database_access import get_dao, get_urban_by_id
 from services.insee import get_population
+from .get_avg_speed import get_avg_speed_route
 populationTotale = 0
 
 def get_route(agency_id, route_id):
@@ -19,6 +20,7 @@ def get_route(agency_id, route_id):
 	parsedRoute["category"] = urban["category"]
 	parsedRoute["interdistance"] = urban["interdistance"]
 	parsedRoute["ratio"] = urban["ratio"] if(urban["ratio"] != float("inf")) else None
+	parsedRoute["average_speed"] = get_avg_speed_route(agency_id, route_id)
 
 	# All trips have same trip_id so we may use only the first : route.trips[0]
 	if len(route.trips) is not 0:

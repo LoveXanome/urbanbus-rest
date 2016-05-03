@@ -248,7 +248,7 @@ def get_average_speed_route(agency_id, route_id):
 		temps = ((results[len(results)-1])[2]-(results[1])[2])
 		distance = ((results[len(results)-1])[3]-(results[1])[3])
 		vitesse = (distance/temps)*3.6
-	return {'vitesse_moyenne_ligne' : vitesse}
+	return vitesse
 
 def get_random_mean_lat_lng(dbname):
     engine = create_engine(_get_complete_database_name(dbname))
