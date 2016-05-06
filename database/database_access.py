@@ -18,31 +18,31 @@ sessionmaker_default = None
 ''' Object-Database mapping '''
 
 class Dataset(Base):
-	__tablename__ = 'dataset'
-	__table_args__ = {'useexisting': True, 'sqlite_autoincrement': True}
-	
-	id = Column(Integer, primary_key=True, nullable=False)
-	database_name = Column(String, nullable=False)
-	add_date = Column(DateTime, default=func.now(), nullable=False)
-	upload_done = Column(Boolean, nullable=False, default=False)
-	upload_failed = Column(Boolean, nullable=False, default=False)
-	
-	def __repr__(self):
-		return "<Dataset(id='{0}', database_name='{1}', add_date='{2}', upload_done='{3}', upload_failed='{4}')>".format(self.id, self.database_name, self.add_date, self.upload_done, self.upload_failed)
-	
+    __tablename__ = 'dataset'
+    __table_args__ = {'useexisting': True, 'sqlite_autoincrement': True}
+    
+    id = Column(Integer, primary_key=True, nullable=False)
+    database_name = Column(String, nullable=False)
+    add_date = Column(DateTime, default=func.now(), nullable=False)
+    upload_done = Column(Boolean, nullable=False, default=False)
+    upload_failed = Column(Boolean, nullable=False, default=False)
+    
+    def __repr__(self):
+        return "<Dataset(id='{0}', database_name='{1}', add_date='{2}', upload_done='{3}', upload_failed='{4}')>".format(self.id, self.database_name, self.add_date, self.upload_done, self.upload_failed)
+    
 class Agency(Base):
-	__tablename__ = 'agency'
-	__table_args__ = {'useexisting': True, 'sqlite_autoincrement': True}
-	
-	id = Column(Integer, primary_key=True, nullable=False)
-	agency_id = Column(String, nullable=False)
-	agency_name = Column(String, nullable=False)
-	latitude = Column(Float, nullable=False)
-	longitude = Column(Float, nullable=False)
-	dataset = Column(Integer, ForeignKey('dataset.id'))
-	
-	def __repr__(self):
-		return "<Agency(id='{0}', agency_id='{1}', agency_name='{2}', dataset='{3}')>".format(self.id, self.agency_id, self.agency_name, self.dataset)
+    __tablename__ = 'agency'
+    __table_args__ = {'useexisting': True, 'sqlite_autoincrement': True}
+    
+    id = Column(Integer, primary_key=True, nullable=False)
+    agency_id = Column(String, nullable=False)
+    agency_name = Column(String, nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
+    dataset = Column(Integer, ForeignKey('dataset.id'))
+    
+    def __repr__(self):
+        return "<Agency(id='{0}', agency_id='{1}', agency_name='{2}', dataset='{3}')>".format(self.id, self.agency_id, self.agency_name, self.dataset)
 
 class Urban(GtfsBase):
     __tablename__ = 'urban'
@@ -58,15 +58,15 @@ class Urban(GtfsBase):
         return "<Urban(id='{0}', category='{1}', route='{2}')>".format(self.id, self.category, self.route)
 
 class Population(Base) :
-	__tablename__ = 'population'
-	__table_args__ = {'useexisting': True}
+    __tablename__ = 'population'
+    __table_args__ = {'useexisting': True}
 
-	dataset = Column(Integer, ForeignKey('dataset.id'), primary_key=True, nullable=False)
-	stop_id = Column(String, primary_key=True, nullable=False)
-	population = Column(Integer, nullable=True)
-	
-	def __repr__(self):
-		return "<Population(agency_id='{0}', stop_id='{1}', population='{2}')>".format(self.agency_id, self.stop_id, self.population)
+    dataset = Column(Integer, ForeignKey('dataset.id'), primary_key=True, nullable=False)
+    stop_id = Column(String, primary_key=True, nullable=False)
+    population = Column(Integer, nullable=True)
+    
+    def __repr__(self):
+        return "<Population(agency_id='{0}', stop_id='{1}', population='{2}')>".format(self.agency_id, self.stop_id, self.population)
 
 ''' "public" functions '''
 
@@ -83,17 +83,17 @@ def init_db():
         pass
 
 def get_dao(agency_id):
-	database_name = _retrieve_database(agency_id)
-	complete_db_name = _get_complete_database_name(database_name)
-	return dao.Dao(complete_db_name)
+    database_name = _retrieve_database(agency_id)
+    complete_db_name = _get_complete_database_name(database_name)
+    return dao.Dao(complete_db_name)
 
 def get_all_agencies():
-	session = _get_default_db_session()
-	agencies = []
-	for row in session.query(Agency).all():
-		agencies.append(row)
-	session.close()
-	return agencies
+    session = _get_default_db_session()
+    agencies = []
+    for row in session.query(Agency).all():
+        agencies.append(row)
+    session.close()
+    return agencies
 
 def get_agency_by_id(agency_id):
     session = _get_default_db_session()
@@ -108,18 +108,18 @@ def create_db(dbname):
     _database_op(dbname, create=True)
 
 def access_direct_dao(dbname):
-	return dao.Dao(_get_complete_database_name(dbname))	
+    return dao.Dao(_get_complete_database_name(dbname))	
 
 def create_dataset(dbname):
-	session = _get_default_db_session()
-	
-	new_dataset = Dataset(database_name=dbname)
-	session.add(new_dataset)
-	session.commit()
-	
-	new_dataset_id = new_dataset.id
-	session.close()
-	return new_dataset_id
+    session = _get_default_db_session()
+    
+    new_dataset = Dataset(database_name=dbname)
+    session.add(new_dataset)
+    session.commit()
+    
+    new_dataset_id = new_dataset.id
+    session.close()
+    return new_dataset_id
 
 def set_done(dataset_id):
     session = _get_default_db_session()
@@ -158,120 +158,120 @@ def get_last_dataset_status():
     return done, fail
 
 def update_agencies(new_agencies, new_dataset_id, lat, lng):
-	session = _get_default_db_session()
-	old_ids = []
-	for agency in new_agencies:
-		if _agency_exist(session, agency.agency_id, agency.agency_name):
-			ag = session.query(Agency).filter(Agency.agency_id == agency.agency_id, Agency.agency_name == agency.agency_name)[0]
-			old_ids.append(ag.dataset)
-			ag.dataset = new_dataset_id
-			ag.latitude = lat
-			ag.longitude = lng
-		else:
-			session.add(Agency( agency_id=agency.agency_id,
+    session = _get_default_db_session()
+    old_ids = []
+    for agency in new_agencies:
+        if _agency_exist(session, agency.agency_id, agency.agency_name):
+            ag = session.query(Agency).filter(Agency.agency_id == agency.agency_id, Agency.agency_name == agency.agency_name)[0]
+            old_ids.append(ag.dataset)
+            ag.dataset = new_dataset_id
+            ag.latitude = lat
+            ag.longitude = lng
+        else:
+            session.add(Agency( agency_id=agency.agency_id,
                                 agency_name=agency.agency_name,
                                 latitude=lat,
                                 longitude=lng,
                                 dataset=new_dataset_id))
-			
-	session.commit()
-	session.close()
-	return old_ids
-	
+            
+    session.commit()
+    session.close()
+    return old_ids
+    
 def delete_dataset(id):
-	session = _get_default_db_session()
-	
-	dataset = session.query(Dataset).filter(Dataset.id == id)[0]
-	dbname = dataset.database_name
-	drop_database(dbname)
-	session.delete(dataset)
-	
-	session.commit()
-	session.close()
-	
+    session = _get_default_db_session()
+    
+    dataset = session.query(Dataset).filter(Dataset.id == id)[0]
+    dbname = dataset.database_name
+    drop_database(dbname)
+    session.delete(dataset)
+    
+    session.commit()
+    session.close()
+    
 def get_passages(agency_id, stop_id, route_id):
-	database_name = _retrieve_database(agency_id)
-	complete_db_name = _get_complete_database_name(database_name)
-	engine = create_engine(complete_db_name)
-	with engine.connect() as con:
-		sql_result = con.execute("SELECT trips.service_id,count(*) as passages FROM trips, stop_times where stop_times.stop_id = '"+ stop_id +"' AND stop_times.trip_id = trips.trip_id AND trips.route_id = '" + route_id + "' GROUP BY trips.service_id ORDER BY passages desc")
-		results = []
-		for r in sql_result:
-			results.append(r)
-		rMax = (results[0])[1]/5
-		rMin = (results[len(results)-1])[1]
-	return {'passagesWeek' : rMax, 'passagesWE' : rMin}
-	
+    database_name = _retrieve_database(agency_id)
+    complete_db_name = _get_complete_database_name(database_name)
+    engine = create_engine(complete_db_name)
+    with engine.connect() as con:
+        sql_result = con.execute("SELECT trips.service_id,count(*) as passages FROM trips, stop_times where stop_times.stop_id = '"+ stop_id +"' AND stop_times.trip_id = trips.trip_id AND trips.route_id = '" + route_id + "' GROUP BY trips.service_id ORDER BY passages desc")
+        results = []
+        for r in sql_result:
+            results.append(r)
+        rMax = (results[0])[1]/5
+        rMin = (results[len(results)-1])[1]
+    return {'passagesWeek' : rMax, 'passagesWE' : rMin}
+    
 def get_average_speed(agency_id, stop_id, route_id):
-	database_name = _retrieve_database(agency_id)
-	complete_db_name = _get_complete_database_name(database_name)
-	engine = create_engine(complete_db_name)
-	with engine.connect() as con:
-		sql_result = con.execute("SELECT  stop_times.stop_sequence, stop_times.stop_id, stop_times.departure_time, stop_times.arrival_time, stop_times.shape_dist_traveled, count(stop_times.stop_id) as total FROM stop_times,trips where stop_times.trip_id = trips.trip_id and trips.route_id = '"+ route_id +"' GROUP BY stop_times.stop_id ORDER BY stop_times.stop_sequence asc")
-		total = 0
-		totalStop = 0
-		for r in sql_result:
-			total = r[5]
-			break
-		for r in sql_result:
-			if str(r[1]) == stop_id:
-				totalStop = r[5]
-		sql_resultat = con.execute("SELECT  stop_times.stop_sequence, stop_times.stop_id, stop_times.departure_time, stop_times.arrival_time, stop_times.shape_dist_traveled, count(stop_times.stop_id) as total FROM stop_times,trips where stop_times.trip_id = trips.trip_id and trips.route_id = '"+ route_id +"' GROUP BY stop_times.stop_id ORDER BY stop_times.stop_sequence asc")
-		results = []
-		indiceStop = -1
-		indiceTerminus = 0
-		terminusTrouve = False
-		for r in sql_resultat:
-			if (r[5] == total) or (r[5] == totalStop):
-				results.append(r)
-				if not terminusTrouve:
-					if str(r[1]) == stop_id:
-						indiceStop = r[0]
-					if not r[2]:
-						indiceTerminus = r[0]
-						terminusTrouve = True
-		#print(len(results))
-		if indiceStop < 0:
-			vitesse = get_average_speed_route(agency_id, route_id)
-			return vitesse
-		if indiceStop > 2 :
-			indiceMoins = 2
-		elif indiceStop == 2:
-			indiceMoins = 1
-		elif indiceStop == 1 :
-			indiceMoins = 0
-		else :
-			indiceMoins = -1
-		if indiceStop < indiceTerminus-1:
-			indicePlus = 2
-		elif indiceStop == indiceTerminus-1:
-			indicePlus = 1
-		else:
-			indicePlus = 0
-		temps = ((results[indiceStop+indicePlus])[3]-(results[indiceStop-indiceMoins])[2])
-		distance = ((results[indiceStop+indicePlus])[4]-(results[indiceStop-indiceMoins])[4])
-		vitesse = (distance/temps)*3.6
-	return abs(vitesse)
-	
+    database_name = _retrieve_database(agency_id)
+    complete_db_name = _get_complete_database_name(database_name)
+    engine = create_engine(complete_db_name)
+    with engine.connect() as con:
+        sql_result = con.execute("SELECT  stop_times.stop_sequence, stop_times.stop_id, stop_times.departure_time, stop_times.arrival_time, stop_times.shape_dist_traveled, count(stop_times.stop_id) as total FROM stop_times,trips where stop_times.trip_id = trips.trip_id and trips.route_id = '"+ route_id +"' GROUP BY stop_times.stop_id ORDER BY stop_times.stop_sequence asc")
+        total = 0
+        totalStop = 0
+        for r in sql_result:
+            total = r[5]
+            break
+        for r in sql_result:
+            if str(r[1]) == stop_id:
+                totalStop = r[5]
+        sql_resultat = con.execute("SELECT  stop_times.stop_sequence, stop_times.stop_id, stop_times.departure_time, stop_times.arrival_time, stop_times.shape_dist_traveled, count(stop_times.stop_id) as total FROM stop_times,trips where stop_times.trip_id = trips.trip_id and trips.route_id = '"+ route_id +"' GROUP BY stop_times.stop_id ORDER BY stop_times.stop_sequence asc")
+        results = []
+        indiceStop = -1
+        indiceTerminus = 0
+        terminusTrouve = False
+        for r in sql_resultat:
+            if (r[5] == total) or (r[5] == totalStop):
+                results.append(r)
+                if not terminusTrouve:
+                    if str(r[1]) == stop_id:
+                        indiceStop = r[0]
+                    if not r[2]:
+                        indiceTerminus = r[0]
+                        terminusTrouve = True
+        #print(len(results))
+        if indiceStop < 0:
+            vitesse = get_average_speed_route(agency_id, route_id)
+            return vitesse
+        if indiceStop > 2 :
+            indiceMoins = 2
+        elif indiceStop == 2:
+            indiceMoins = 1
+        elif indiceStop == 1 :
+            indiceMoins = 0
+        else :
+            indiceMoins = -1
+        if indiceStop < indiceTerminus-1:
+            indicePlus = 2
+        elif indiceStop == indiceTerminus-1:
+            indicePlus = 1
+        else:
+            indicePlus = 0
+        temps = ((results[indiceStop+indicePlus])[3]-(results[indiceStop-indiceMoins])[2])
+        distance = ((results[indiceStop+indicePlus])[4]-(results[indiceStop-indiceMoins])[4])
+        vitesse = (distance/temps)*3.6
+    return abs(vitesse)
+    
 def get_average_speed_route(agency_id, route_id):
-	database_name = _retrieve_database(agency_id)
-	complete_db_name = _get_complete_database_name(database_name)
-	engine = create_engine(complete_db_name)
-	with engine.connect() as con:
-		sql_result = con.execute("SELECT  stop_times.stop_sequence, stop_times.stop_id, stop_times.departure_time, stop_times.arrival_time, stop_times.shape_dist_traveled FROM stop_times,trips where stop_times.trip_id = trips.trip_id and trips.route_id = '" + route_id +"' GROUP BY stop_times.stop_sequence")
-		results = []
-		indiceTerminus = 0
-		terminusTrouve = False
-		for r in sql_result:
-			results.append(r)
-			if not terminusTrouve:
-				if not r[2]:
-					indiceTerminus = r[0]
-					terminusTrouve = True
-		temps = ((results[indiceTerminus])[3]-(results[0])[2])
-		distance = (results[indiceTerminus])[4]
-		vitesse = (distance/temps)*3.6
-	return abs(vitesse)
+    database_name = _retrieve_database(agency_id)
+    complete_db_name = _get_complete_database_name(database_name)
+    engine = create_engine(complete_db_name)
+    with engine.connect() as con:
+        sql_result = con.execute("SELECT  stop_times.stop_sequence, stop_times.stop_id, stop_times.departure_time, stop_times.arrival_time, stop_times.shape_dist_traveled FROM stop_times,trips where stop_times.trip_id = trips.trip_id and trips.route_id = '" + route_id +"' GROUP BY stop_times.stop_sequence")
+        results = []
+        indiceTerminus = 0
+        terminusTrouve = False
+        for r in sql_result:
+            results.append(r)
+            if not terminusTrouve:
+                if not r[2]:
+                    indiceTerminus = r[0]
+                    terminusTrouve = True
+        temps = ((results[indiceTerminus])[3]-(results[0])[2])
+        distance = (results[indiceTerminus])[4]
+        vitesse = (distance/temps)*3.6
+    return abs(vitesse)
 
 def get_random_mean_lat_lng(dbname):
     engine = create_engine(_get_complete_database_name(dbname))
@@ -366,14 +366,14 @@ def fill_population_table(dataset, stop_id, population):
     session.close()
 
 def get_population(agency_id, stop_id):
-	database_name = _get_default_database_name()
-	engine = create_engine(database_name)
-	with engine.connect() as con:
-		sql_result = con.execute("SELECT population FROM agency, population where agency.dataset=population.dataset and population.stop_id= " + str(stop_id) + " and agency.id = " + str(agency_id))
-		results = []
-		for r in sql_result:
-			results.append(r)
-	return results[0][0]
+    database_name = _get_default_database_name()
+    engine = create_engine(database_name)
+    with engine.connect() as con:
+        sql_result = con.execute("SELECT population FROM agency, population where agency.dataset=population.dataset and population.stop_id= " + str(stop_id) + " and agency.id = " + str(agency_id))
+        results = []
+        for r in sql_result:
+            results.append(r)
+    return results[0][0]
 
 def get_stop_routes(agency_id, stop_id):
     database_name = _retrieve_database(agency_id)
@@ -398,32 +398,32 @@ def get_stop_routes(agency_id, stop_id):
 ''' "private" functions '''
 
 def _get_default_db_session():
-	global sessionmaker_default
-	return sessionmaker_default()
+    global sessionmaker_default
+    return sessionmaker_default()
 
 def _retrieve_database(agency_id):
-	session = _get_default_db_session()
-	agencies = []
-	for agency in session.query(Agency).filter(Agency.id==agency_id):
-		agencies.append(agency)
-	if len(agencies) != 1:
-		session.close()
-		raise Exception('Found {0} agencies instead of one'.format(len(agencies)))
-	agency = agencies[0]
-	
-	datasets = []
-	for dataset in session.query(Dataset).filter(Dataset.id==agency.dataset):
-		datasets.append(dataset)
-	if len(datasets) != 1:
-		session.close()
-		raise Exception('Found {0} dataset instead of one'.format(len(datasets)))
-	dataset = datasets[0]
-	
-	session.close()
-	return dataset.database_name
+    session = _get_default_db_session()
+    agencies = []
+    for agency in session.query(Agency).filter(Agency.id==agency_id):
+        agencies.append(agency)
+    if len(agencies) != 1:
+        session.close()
+        raise Exception('Found {0} agencies instead of one'.format(len(agencies)))
+    agency = agencies[0]
+    
+    datasets = []
+    for dataset in session.query(Dataset).filter(Dataset.id==agency.dataset):
+        datasets.append(dataset)
+    if len(datasets) != 1:
+        session.close()
+        raise Exception('Found {0} dataset instead of one'.format(len(datasets)))
+    dataset = datasets[0]
+    
+    session.close()
+    return dataset.database_name
 
 def _get_default_database_name():
-	return _get_complete_database_name("general")
+    return _get_complete_database_name("general")
 
 def _get_complete_database_name(database):
     if config.DATABASE == config.POSTGRE:
@@ -433,10 +433,10 @@ def _get_complete_database_name(database):
 
 
 def _agency_exist(session, id, name):
-	result = []
-	for a in session.query(Agency).filter(Agency.agency_id == id, Agency.agency_name == name):
-		result.append(a)
-	return len(result) != 0
+    result = []
+    for a in session.query(Agency).filter(Agency.agency_id == id, Agency.agency_name == name):
+        result.append(a)
+    return len(result) != 0
 
 
 def _is_urban(route):

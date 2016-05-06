@@ -82,7 +82,7 @@ def display_route(agency_id, route_id):
 def display_stop(agency_id, stop_id):
     params = { 'agency_id': agency_id, 'stop_id': stop_id }
     return call_service(get_stop, "stop", **params)
-	
+    
 
 if __name__ == "__main__":
     init_db()
