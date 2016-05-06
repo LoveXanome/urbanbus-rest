@@ -14,6 +14,3 @@ def calculate_population(dbname, dataset_id):
             pop = get_population_insee(stop.stop_lon, stop.stop_lat, 200)
             print(pop)
             db.fill_population_table(dataset_id, stop.stop_id, pop)
-
-    
-    

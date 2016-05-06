@@ -10,7 +10,6 @@ from gtfsplugins.decret_2015_1610 import decret_2015_1610
 from random import randint
 import config
 from os import remove
-from services.insee import download_insee_files
 
 Base = declarative_base()
 GtfsBase = declarative_base()
@@ -82,7 +81,6 @@ def init_db():
         Base.metadata.create_all(engine)
     except:
         pass
-    download_insee_files()
 
 def get_dao(agency_id):
 	database_name = _retrieve_database(agency_id)

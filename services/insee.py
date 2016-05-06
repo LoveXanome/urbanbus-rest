@@ -16,34 +16,12 @@ def get_population(left,bottom,right,top):
 	p = subprocess.call(command)
 	csvfile = open('INSEE_200m.csv', 'r')
 	fieldnames = ("x","y","ind","men","men_surf_sum","men_surf_norm","men_occ5_sum","men_occ5_norm","men_coll_sum","men_coll_norm","men_5ind_sum","men_5ind_norm","men_1ind_sum","men_1ind_norm","men_prop_sum","men_prop_norm","men_basr_sum","men_basr_norm","ind_age1_sum","ind_age1_norm","ind_age2_sum","ind_age2_norm","ind_age3_sum","ind_age3_norm","ind_age4_sum","ind_age4_norm","ind_age5_sum","ind_age5_norm","ind_age6_sum","ind_age6_norm","ind_age7_sum","ind_age7_norm","ind_age8_sum","ind_age8_norm","ind_srf_sum","ind_srf_norm")
-	reader = csv.DictReader( csvfile, fieldnames)
+	reader = csv.DictReader(csvfile, fieldnames)
 	popTot = 0
 	for row in reader:
-		if row["ind"] != "ind" :
+		if row["ind"] != "ind":
 			popTot = popTot + int(float(row["ind"]))	
 	return popTot
-
-def download_insee_files():
-    if not path.exists(TMP_DIR):
-        makedirs(TMP_DIR)
-    
-    threads = []
-    if not path.isfile("car_m.dbf"):
-        t = Thread(target=_get_file, args=("200m-carreaux-metropole.zip", "car_m.dbf",))
-        threads.append(t)
-        t.start()
-    else:
-        log_trace("car_m.dbf already exists")
-    
-    if not path.isfile("rect_m.dbf"):
-        t = Thread(target=_get_file, args=("200m-rectangles-metropole.zip", "rect_m.dbf",))
-        threads.append(t)
-        t.start()
-    else:
-        log_trace("rect_m.dbf already exists")
-    
-    for t in threads:
-        t.join()
 
 def _get_file(zipname, filename):
     dest_zip = path.join(TMP_DIR, zipname)
