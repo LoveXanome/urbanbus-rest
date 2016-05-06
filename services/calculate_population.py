@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from database import database_access as db
-from services.insee import get_population
+from services.insee import get_population_insee
 
 def calculate_population(dbname, dataset_id):
     full_dbname = db._get_complete_database_name(dbname)
@@ -11,6 +11,6 @@ def calculate_population(dbname, dataset_id):
         # TODO count for progress
         for stop in sql_result:
             print(stop)
-            pop = get_population_insee(stop.stop_lon, stop.stop_lat, 200)
+            pop = get_population_insee(stop.stop_lat, stop.stop_lon, 200)
             print(pop)
             db.fill_population_table(dataset_id, stop.stop_id, pop)

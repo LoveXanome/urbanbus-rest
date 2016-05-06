@@ -440,7 +440,7 @@ def _agency_exist(session, id, name):
 
 
 def _is_urban(route):
-    urb, dis, rat = decret_2015_1610(route.trips)
+    urb, dis, rat = decret_2015_1610(route.trips, False)
     dis = dis if dis else -1
     rat = rat if rat else -1
     return urb, dis, rat

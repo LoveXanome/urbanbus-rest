@@ -9,8 +9,6 @@ import zipfile
 from threading import Thread
 from utils.logger import log_trace
 
-TMP_DIR = "tmp/"
-
 def get_population(left,bottom,right,top):
 	command = "insee-200m-extract.bat --left "+str(left)+" --bottom "+str(bottom)+" --right "+str(right)+" --top "+str(top)+" --csv --outputPrefix INSEE_200m"
 	p = subprocess.call(command)
@@ -22,3 +20,17 @@ def get_population(left,bottom,right,top):
 		if row["ind"] != "ind":
 			popTot = popTot + int(float(row["ind"]))	
 	return popTot
+
+def get_population_insee(lat, lng, dist):
+	distDegree = dist * 0.0001 / 7.89 #Conversion des mètres en degrés
+	left = lng - distDegree
+	right = lng + distDegree
+	top = lat + distDegree
+	bottom = lat - distDegree
+	if left > right :
+		left = right
+		right = lng + distDegree
+	if bottom > top :
+		top = bottom
+		bottom = lat + distDegree
+	return get_population(left,bottom,right,top)
