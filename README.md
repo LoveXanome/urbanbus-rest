@@ -2,13 +2,14 @@
 
 ## Init
 
+Clone the repository and its submodules :
 * `git clone https://github.com/LoveXanome/urbanbus-rest.git`
 * `git submodule update --init --recursive`
 
-Download these two folders : 
-http://www.insee.fr/fr/ppp/bases-de-donnees/donnees-detaillees/donnees-carroyees/zip/200m-carreaux-metropole.zip
-http://www.insee.fr/fr/ppp/bases-de-donnees/donnees-detaillees/donnees-carroyees/zip/200m-rectangles-metropole.zip
-Unzip them and then place 'car_m.dbf' and 'rect_m.dbf' in the root folder; with 'app.py'.
+Then, download these two files, unzip them and place `car_m.dbf` and `rect_m.dbf` in the root folder; with `app.py` :
+* http://www.insee.fr/fr/ppp/bases-de-donnees/donnees-detaillees/donnees-carroyees/zip/200m-carreaux-metropole.zip
+* http://www.insee.fr/fr/ppp/bases-de-donnees/donnees-detaillees/donnees-carroyees/zip/200m-rectangles-metropole.zip
+
 
 ## Production
 
