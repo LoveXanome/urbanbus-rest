@@ -22,20 +22,3 @@ def get_population(left,bottom,right,top):
 		if row["ind"] != "ind":
 			popTot = popTot + int(float(row["ind"]))	
 	return popTot
-
-def _get_file(zipname, filename):
-    dest_zip = path.join(TMP_DIR, zipname)
-    # Download
-    log_trace("Downloading {0}".format(dest_zip))
-    file = requests.get("http://www.insee.fr/fr/ppp/bases-de-donnees/donnees-detaillees/donnees-carroyees/zip/{0}".format(zipname))
-    with open(dest_zip, 'wb') as f:
-        f.write(file.content)
-    # Unzip
-    log_trace("Unziping {0}".format(dest_zip))
-    with zipfile.ZipFile(dest_zip, 'r') as zip_ref:
-        zip_ref.extractall(TMP_DIR)
-    # Move
-    src = path.join(dest_zip[:-4], filename)
-    dest = filename
-    log_trace("Moving {0} to {1}".format(src, dest))
-    rename(src, dest)
