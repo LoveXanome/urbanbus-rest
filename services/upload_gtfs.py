@@ -3,7 +3,7 @@
 from datetime import datetime
 import os
 from database import database_access as db
-from services.calculate_population import calculate_population
+from services.calculate_population import calculate_population, nb_stops
 from utils.logger import log_trace, log_error
 
 TMPDIR = 'tmp/'
@@ -31,6 +31,8 @@ def add_gtfs_to_db(file):
         dataset_id = db.create_dataset(dbname)
         log_trace("Loading GTFS...")
         dao.load_gtfs(file)
+        db.set_nb_lines(dataset_id, len(dao.routes()))
+        db.set_nb_stops(dataset_id, nb_stops(dbname))
         new_agencies = dao.agencies()
         log_trace("Calculating lat/lng of agencies...")
         lat, lng = db.get_random_mean_lat_lng(dbname)
@@ -39,9 +41,11 @@ def add_gtfs_to_db(file):
         for old_id in old_dataset_ids:
             log_trace("Deleting old dataset...")
             db.delete_dataset(old_id)
-        calculate_urban(dbname)
+        calculate_urban(dbname, dataset_id)
+        db.set_urban_done(dataset_id)
         log_trace("Filling population database...")
         calculate_population(dbname, dataset_id)
+        db.set_population_done(dataset_id)
 
         log_trace("Setting success...")
         db.set_done(dataset_id)
@@ -55,15 +59,13 @@ def add_gtfs_to_db(file):
 
     return dbname
 
-def calculate_urban(dbname):
+def calculate_urban(dbname, dataset_id):
     log_trace("Creating and filling urban table...")
-    db.create_and_fill_urban_table(dbname)
+    db.create_and_fill_urban_table(dbname, dataset_id)
     log_trace("Done calculating urban")
 
 def status_of_last_upload():
-    done, fail = db.get_last_dataset_status()
-    return {"done": done, 
-            "failed": fail }
+    return db.get_last_dataset_status()
 
 def _filename_to_dbname(filename):
     filename = os.path.basename(filename)

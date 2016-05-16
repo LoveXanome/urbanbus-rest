@@ -24,9 +24,21 @@ class Dataset(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     database_name = Column(String, nullable=False)
     add_date = Column(DateTime, default=func.now(), nullable=False)
+
+    ''' Progress infos, could (and should) be stored in a different table '''
     upload_done = Column(Boolean, nullable=False, default=False)
     upload_failed = Column(Boolean, nullable=False, default=False)
-    
+    error_msg = Column(String, nullable=True)
+
+    number_of_lines = Column(Integer, nullable=False, default=0)
+    number_of_stops = Column(Integer, nullable=False, default=0)
+
+    urban_calculation_done = Column(Boolean, nullable=False, default=False)
+    number_of_urban_calculations_done = Column(Integer, nullable=False, default=0)
+
+    population_calculation_done = Column(Boolean, nullable=False, default=False)
+    number_of_population_calculations_done = Column(Integer, nullable=False, default=0)
+        
     def __repr__(self):
         return "<Dataset(id='{0}', database_name='{1}', add_date='{2}', upload_done='{3}', upload_failed='{4}')>".format(self.id, self.database_name, self.add_date, self.upload_done, self.upload_failed)
     
@@ -57,7 +69,7 @@ class Urban(GtfsBase):
     def __repr__(self):
         return "<Urban(id='{0}', category='{1}', route='{2}')>".format(self.id, self.category, self.route)
 
-class Population(Base) :
+class Population(Base):
     __tablename__ = 'population'
     __table_args__ = {'useexisting': True}
 
@@ -120,42 +132,6 @@ def create_dataset(dbname):
     new_dataset_id = new_dataset.id
     session.close()
     return new_dataset_id
-
-def set_done(dataset_id):
-    session = _get_default_db_session()
-    dataset = None
-    for d in session.query(Dataset).filter(Dataset.id==dataset_id):
-        dataset = d
-        break
-    if not dataset:
-        raise Exception("Could not find dataset with id {0}".format(dataset_id))
-    dataset.upload_done = True
-    session.commit()
-    session.close()
-
-def set_failed(dataset_id):
-    session = _get_default_db_session()
-    dataset = None
-    for d in session.query(Dataset).filter(Dataset.id==dataset_id):
-        dataset = d
-        break
-    if not dataset:
-        raise Exception("Could not find dataset with id {0}".format(dataset_id))
-    dataset.upload_failed = True
-    session.commit()
-    session.close()
-
-def get_last_dataset_status():
-    session = _get_default_db_session()
-    done = False
-    fail = False
-    for d in session.query(Dataset).order_by(Dataset.id.desc()):
-        done = d.upload_done
-        fail = d.upload_failed
-        break
-    session.commit()
-    session.close()
-    return done, fail
 
 def update_agencies(new_agencies, new_dataset_id, lat, lng):
     session = _get_default_db_session()
@@ -316,7 +292,7 @@ def drop_database(dbname):
     _database_op(dbname, create=False, drop=True)
 
 # Functions for urban table
-def create_and_fill_urban_table(dbname):
+def create_and_fill_urban_table(dbname, dataset_id):
     full_dbname = _get_complete_database_name(dbname)
     engine = _create_urban_table(full_dbname)
     sessionmk = sessionmaker(bind=engine)
@@ -326,6 +302,7 @@ def create_and_fill_urban_table(dbname):
     for route in dbdao.routes(prefetch_trips=True):
         urban, distance, ratio = _is_urban(route)
         _insert_urban(session, route.route_id, urban, distance, ratio)
+        inc_nb_urban(dataset_id)
     session.close()
 
 def get_urban(agency_id):
@@ -481,3 +458,129 @@ def _database_op(dbname, create=True, drop=False):
         if drop:
             remove("database/{0}.sqlite".format(dbname))
 
+''' Progress functions '''
+def set_nb_lines(dataset_id, nb_lines):
+    session = _get_default_db_session()
+    dataset = None
+    for d in session.query(Dataset).filter(Dataset.id==dataset_id):
+        dataset = d
+        break
+    if not dataset:
+        raise Exception("Could not find dataset with id {0}".format(dataset_id))
+    dataset.number_of_lines = nb_lines
+    session.commit()
+    session.close()
+
+def set_nb_stops(dataset_id, nb_stops):
+    session = _get_default_db_session()
+    dataset = None
+    for d in session.query(Dataset).filter(Dataset.id==dataset_id):
+        dataset = d
+        break
+    if not dataset:
+        raise Exception("Could not find dataset with id {0}".format(dataset_id))
+    dataset.number_of_stops = nb_stops
+    session.commit()
+    session.close()
+
+def set_done(dataset_id):
+    session = _get_default_db_session()
+    dataset = None
+    for d in session.query(Dataset).filter(Dataset.id==dataset_id):
+        dataset = d
+        break
+    if not dataset:
+        raise Exception("Could not find dataset with id {0}".format(dataset_id))
+    dataset.upload_done = True
+    session.commit()
+    session.close()
+
+def set_urban_done(dataset_id):
+    session = _get_default_db_session()
+    dataset = None
+    for d in session.query(Dataset).filter(Dataset.id==dataset_id):
+        dataset = d
+        break
+    if not dataset:
+        raise Exception("Could not find dataset with id {0}".format(dataset_id))
+    dataset.urban_calculation_done = True
+    session.commit()
+    session.close()
+
+def inc_nb_urban(dataset_id):
+    session = _get_default_db_session()
+    dataset = None
+    for d in session.query(Dataset).filter(Dataset.id==dataset_id):
+        dataset = d
+        break
+    if not dataset:
+        raise Exception("Could not find dataset with id {0}".format(dataset_id))
+    dataset.number_of_urban_calculations_done += 1
+    session.commit()
+    session.close()
+
+def inc_nb_population(dataset_id):
+    session = _get_default_db_session()
+    dataset = None
+    for d in session.query(Dataset).filter(Dataset.id==dataset_id):
+        dataset = d
+        break
+    if not dataset:
+        raise Exception("Could not find dataset with id {0}".format(dataset_id))
+    dataset.number_of_population_calculations_done += 1
+    session.commit()
+    session.close()
+
+def set_population_done(dataset_id):
+    session = _get_default_db_session()
+    dataset = None
+    for d in session.query(Dataset).filter(Dataset.id==dataset_id):
+        dataset = d
+        break
+    if not dataset:
+        raise Exception("Could not find dataset with id {0}".format(dataset_id))
+    dataset.population_calculation_done = True
+    session.commit()
+    session.close()
+
+def set_failed(dataset_id):
+    session = _get_default_db_session()
+    dataset = None
+    for d in session.query(Dataset).filter(Dataset.id==dataset_id):
+        dataset = d
+        break
+    if not dataset:
+        raise Exception("Could not find dataset with id {0}".format(dataset_id))
+    dataset.upload_failed = True
+
+    session.commit()
+    session.close()
+
+def get_last_dataset_status():
+    session = _get_default_db_session()
+    done = False
+    fail = False
+    for d in session.query(Dataset).order_by(Dataset.id.desc()):
+        done = d.upload_done
+        fail = d.upload_failed
+        nb_lines = d.number_of_lines
+        nb_stops = d.number_of_stops
+
+        urban_done = d.urban_calculation_done
+        nb_urban_done = d.number_of_urban_calculations_done
+
+        pop_done = d.population_calculation_done
+        nb_pop_done = d.number_of_population_calculations_done
+        break
+    session.commit()
+    session.close()
+    return {
+            'done': done, 
+            'failed': fail,
+            'nb_lines': nb_lines,
+            'nb_stops': nb_stops,
+            'urban_done': urban_done,
+            'nb_urban_done': nb_urban_done,
+            'pop_done': pop_done,
+            'nb_pop_done': nb_pop_done
+            }
