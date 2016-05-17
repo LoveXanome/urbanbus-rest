@@ -200,7 +200,7 @@ def get_passages(agency_id, stop_id, route_id):
 		results = []
 		for r in sql_result:
 			results.append(r)
-		rMax = (results[0])[1]/5
+		rMax = (results[0])[1]
 		rMin = (results[len(results)-1])[1]
 	return {'passagesWeek' : rMax, 'passagesWE' : rMin}
 	
